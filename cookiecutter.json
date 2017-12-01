@@ -16,7 +16,7 @@
     
 
     "postgres_password": "changethis",
-    "pgadmin_default_user": "admin@{{cookiecutter.domain_main}}",
+    "pgadmin_default_user": "{{cookiecutter.first_superuser}}",
     "pgadmin_default_user_password": "changethis",
     
     "traefik_constraint_tag": "{{cookiecutter.domain_main}}",
@@ -29,9 +29,11 @@
     
     "sentry_dsn": "",
 
-    "docker_image_backend": "backend",
-    "docker_image_celeryworker": "celeryworker",
-    "docker_image_frontend": "frontend",
+    "docker_image_prefix": "",
+
+    "docker_image_backend": "{{cookiecutter.docker_image_prefix}}backend",
+    "docker_image_celeryworker": "{{cookiecutter.docker_image_prefix}}celeryworker",
+    "docker_image_frontend": "{{cookiecutter.docker_image_prefix}}frontend",
 
     "_copy_without_render": [
         "frontend/src/**/*.html",
