@@ -178,29 +178,29 @@ Traefik UI: http://{{cookiecutter.domain_dev}}:8080
 
 ## Project Cookiecutter variables used during generation
 
-`project_name`: {{cookiecutter.project_name}}
-`project_slug`: {{cookiecutter.project_slug}}
-`domain_main`: {{cookiecutter.domain_main}}
-`domain_staging`: {{cookiecutter.domain_staging}}
-`domain_branch`: {{cookiecutter.domain_branch}}
-`domain_dev`: {{cookiecutter.domain_dev}}
-`docker_swarm_stack_name_main`: {{cookiecutter.docker_swarm_stack_name_main}}
-`docker_swarm_stack_name_staging`: {{cookiecutter.docker_swarm_stack_name_staging}}
-`docker_swarm_stack_name_branch`: {{cookiecutter.docker_swarm_stack_name_branch}}
-`secret_key`: {{cookiecutter.secret_key}}
-`first_superuser`: {{cookiecutter.first_superuser}}
-`first_superuser_password`: {{cookiecutter.first_superuser_password}}
-`postgres_password`: {{cookiecutter.postgres_password}}
-`pgadmin_default_user`: {{cookiecutter.pgadmin_default_user}}
-`pgadmin_default_user_password`: {{cookiecutter.pgadmin_default_user_password}}
-`traefik_constraint_tag`: {{cookiecutter.traefik_constraint_tag}}
-`traefik_constraint_tag_staging`: {{cookiecutter.traefik_constraint_tag_staging}}
-`traefik_constraint_tag_branch`: {{cookiecutter.traefik_constraint_tag_branch}}
-`traefik_public_network`: {{cookiecutter.traefik_public_network}}
-`traefik_public_constraint_tag`: {{cookiecutter.traefik_public_constraint_tag}}
-`flower_auth`: {{cookiecutter.flower_auth}}
-`sentry_dsn`: {{cookiecutter.sentry_dsn}}
-`docker_image_prefix`: {{cookiecutter.docker_image_prefix}}
-`docker_image_backend`: {{cookiecutter.docker_image_backend}}
-`docker_image_celeryworker`: {{cookiecutter.docker_image_celeryworker}}
-`docker_image_frontend`: {{cookiecutter.docker_image_frontend}}
+* `project_name`: {{cookiecutter.project_name}}
+* `project_slug`: {{cookiecutter.project_slug}}
+* `domain_main`: {{cookiecutter.domain_main}}
+* `domain_staging`: {{cookiecutter.domain_staging}}
+* `domain_branch`: {{cookiecutter.domain_branch}}
+* `domain_dev`: {{cookiecutter.domain_dev}}
+* `docker_swarm_stack_name_main`: {{cookiecutter.docker_swarm_stack_name_main}}
+* `docker_swarm_stack_name_staging`: {{cookiecutter.docker_swarm_stack_name_staging}}
+* `docker_swarm_stack_name_branch`: {{cookiecutter.docker_swarm_stack_name_branch}}
+* `secret_key`: {{cookiecutter.secret_key}}
+* `first_superuser`: {{cookiecutter.first_superuser}}
+* `first_superuser_password`: {{cookiecutter.first_superuser_password}}
+* `postgres_password`: {{cookiecutter.postgres_password}}
+* `pgadmin_default_user`: {{cookiecutter.pgadmin_default_user}}
+* `pgadmin_default_user_password`: {{cookiecutter.pgadmin_default_user_password}}
+* `traefik_constraint_tag`: {{cookiecutter.traefik_constraint_tag}}
+* `traefik_constraint_tag_staging`: {{cookiecutter.traefik_constraint_tag_staging}}
+* `traefik_constraint_tag_branch`: {{cookiecutter.traefik_constraint_tag_branch}}
+* `traefik_public_network`: {{cookiecutter.traefik_public_network}}
+* `traefik_public_constraint_tag`: {{cookiecutter.traefik_public_constraint_tag}}
+* `flower_auth`: {{cookiecutter.flower_auth}}
+* `sentry_dsn`: {{cookiecutter.sentry_dsn}}
+* `docker_image_prefix`: {{cookiecutter.docker_image_prefix}}
+* `docker_image_backend`: {{cookiecutter.docker_image_backend}}
+* `docker_image_celeryworker`: {{cookiecutter.docker_image_celeryworker}}
+* `docker_image_frontend`: {{cookiecutter.docker_image_frontend}}
