@@ -6,9 +6,9 @@
     "domain_branch": "branch.{{cookiecutter.domain_main}}",
     "domain_dev": "dev.{{cookiecutter.domain_main}}",
 
-    "docker_swarm_stack_name_main": "{{domain_main|replace('.', '-')}}",
-    "docker_swarm_stack_name_staging": "{{domain_staging|replace('.', '-')}}",
-    "docker_swarm_stack_name_branch": "{{domain_branch|replace('.', '-')}}",
+    "docker_swarm_stack_name_main": "{{cookiecutter.domain_main|replace('.', '-')}}",
+    "docker_swarm_stack_name_staging": "{{cookiecutter.domain_staging|replace('.', '-')}}",
+    "docker_swarm_stack_name_branch": "{{cookiecutter.domain_branch|replace('.', '-')}}",
 
     "secret_key": "changethis",
     "first_superuser": "admin@{{cookiecutter.domain_main}}",
