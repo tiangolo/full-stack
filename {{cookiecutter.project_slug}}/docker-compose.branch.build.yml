@@ -1,0 +1,13 @@
+version: '3'
+services:
+  backend:
+    build: ./backend
+    image: '{{cookiecutter.docker_image_backend}}:branch'
+  celeryworker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-celery-worker
+    image: '{{cookiecutter.docker_image_celeryworker}}:branch'
+  frontend:
+    build: ./backend
+    image: '{{cookiecutter.docker_image_frontend}}:branch'

@@ -1,0 +1,122 @@
+version: '3'
+services:
+  db:
+    image: 'postgres:10'
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: {{cookiecutter.postgres_password}}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - 'app-db-data:/var/lib/postgresql/data/pgdata'
+  queue:
+    image: 'rabbitmq:3'
+  pgadmin:
+    image: fenglc/pgadmin4
+    depends_on:
+      - db
+    environment:
+      - DEFAULT_USER={{cookiecutter.pgadmin_default_user}}
+      - DEFAULT_PASSWORD={{cookiecutter.pgadmin_default_user_password}}
+    deploy:
+      labels:
+        - "traefik.frontend.rule=Host:pgadmin.{{cookiecutter.domain_branch}}"
+        - "traefik.enable=true"
+        - "traefik.port=5050"
+        - "traefik.tags={{cookiecutter.traefik_public_constraint_tag}}"
+        - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
+        - "traefik.frontend.entryPoints=http,https"
+    networks:
+      - {{cookiecutter.traefik_public_network}}
+      - default
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    environment:
+      - API_URL=https://{{cookiecutter.domain_branch}}/api/v1/swagger/
+    deploy:
+      labels:
+        - "traefik.frontend.rule=PathPrefixStrip:/swagger/"
+        - "traefik.enable=true"
+        - "traefik.port=8080"
+        - "traefik.tags={{cookiecutter.traefik_constraint_tag_branch}}"
+  proxy:
+    image: traefik:v1.4
+    command: --docker \
+      --docker.swarmmode \
+      --docker.watch \
+      --docker.exposedbydefault=false \
+      --constraints=tag=={{cookiecutter.traefik_constraint_tag_branch}} \
+      --logLevel=DEBUG \
+      --web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - "traefik.frontend.rule=Host:{{cookiecutter.domain_branch}}"
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.tags={{cookiecutter.traefik_public_constraint_tag}}"
+        - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
+        - "traefik.frontend.entryPoints=http,https"
+    networks:
+      - {{cookiecutter.traefik_public_network}}
+      - default
+  flower:
+    image: 'totem/celery-flower-docker'
+    environment:
+      - FLOWER_BASIC_AUTH={{cookiecutter.flower_auth}}
+    deploy:
+      labels:
+        - "traefik.frontend.rule=Host:flower.{{cookiecutter.domain_branch}}"
+        - "traefik.enable=true"
+        - "traefik.port=5555"
+        - "traefik.tags={{cookiecutter.traefik_public_constraint_tag}}"
+        - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
+        - "traefik.frontend.entryPoints=http,https"
+    networks:
+      - {{cookiecutter.traefik_public_network}}
+      - default
+        
+  backend:
+    image: '{{cookiecutter.docker_image_backend}}:branch'
+    depends_on: 
+      - db
+    environment:
+      - SERVER_NAME={{cookiecutter.domain_branch}}
+      - 'SECRET_KEY={{cookiecutter.secret_key}}'
+      - SENTRY_DSN={{cookiecutter.sentry_dsn}}
+      - POSTGRES_PASSWORD={{cookiecutter.postgres_password}}
+      - FIRST_SUPERUSER={{cookiecutter.first_superuser}}
+      - FIRST_SUPERUSER_PASSWORD={{cookiecutter.first_superuser_password}}
+    deploy:
+      labels:
+        - "traefik.frontend.rule=PathPrefix:/api"
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.tags={{cookiecutter.traefik_constraint_tag_branch}}"
+  celeryworker:
+    image: '{{cookiecutter.docker_image_celeryworker}}:branch'
+    depends_on: 
+      - db
+      - queue
+    environment:
+      - SENTRY_DSN={{cookiecutter.sentry_dsn}}
+      - POSTGRES_PASSWORD={{cookiecutter.postgres_password}}
+      - FIRST_SUPERUSER={{cookiecutter.first_superuser}}
+      - FIRST_SUPERUSER_PASSWORD={{cookiecutter.first_superuser_password}}
+  frontend:
+    image: '{{cookiecutter.docker_image_frontend}}:branch'
+    deploy:
+      labels:
+        - "traefik.frontend.rule=PathPrefix:/"
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.tags={{cookiecutter.traefik_constraint_tag_branch}}"
+
+volumes:
+  app-db-data: {}
+
+networks:
+  {{cookiecutter.traefik_public_network}}:
+    external: true

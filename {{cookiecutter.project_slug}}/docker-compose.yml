@@ -1,0 +1,87 @@
+version: '3'
+services:
+  db:
+    image: 'postgres:10'
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: {{cookiecutter.postgres_password}}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - 'app-db-data:/var/lib/postgresql/data/pgdata'
+  queue:
+    image: 'rabbitmq:3'
+  pgadmin:
+    image: fenglc/pgadmin4
+    depends_on:
+      - db
+    environment:
+      - DEFAULT_USER={{cookiecutter.pgadmin_default_user}}
+      - DEFAULT_PASSWORD={{cookiecutter.pgadmin_default_user_password}}
+    labels:
+      - "traefik.frontend.rule=Host:pgadmin.{{cookiecutter.domain_main}}"
+      - "traefik.enable=true"
+      - "traefik.port=5050"
+      - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    environment:
+      - API_URL=https://{{cookiecutter.domain_main}}/api/v1/swagger/
+    labels:
+      - "traefik.frontend.rule=PathPrefixStrip:/swagger/"
+      - "traefik.enable=true"
+      - "traefik.port=8080"
+      - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
+  proxy:
+    image: traefik:v1.4
+    command: --docker \
+      --docker.watch \
+      --docker.exposedbydefault=false \
+      --constraints=tag=={{cookiecutter.traefik_constraint_tag}} \
+      --logLevel=DEBUG \
+      --web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  flower:
+    image: 'totem/celery-flower-docker'
+    environment:
+      - FLOWER_BASIC_AUTH={{cookiecutter.flower_auth}}
+    labels:
+      - "traefik.frontend.rule=Host:flower.{{cookiecutter.domain_main}}"
+      - "traefik.enable=true"
+      - "traefik.port=5555"
+      - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
+  backend:
+    image: '{{cookiecutter.docker_image_backend}}'
+    depends_on: 
+      - db
+    environment:
+      - SERVER_NAME={{cookiecutter.domain_main}}
+      - SECRET_KEY={{cookiecutter.secret_key}}
+      - SENTRY_DSN={{cookiecutter.sentry_dsn}}
+      - POSTGRES_PASSWORD={{cookiecutter.postgres_password}}
+      - FIRST_SUPERUSER={{cookiecutter.first_superuser}}
+      - FIRST_SUPERUSER_PASSWORD={{cookiecutter.first_superuser_password}}
+    labels:
+      - "traefik.frontend.rule=PathPrefix:/api"
+      - "traefik.enable=true"
+      - "traefik.port=80"
+      - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
+  celeryworker:
+    image: '{{cookiecutter.docker_image_celeryworker}}'
+    depends_on: 
+      - db
+      - queue
+    environment:
+      - SENTRY_DSN={{cookiecutter.sentry_dsn}}
+      - POSTGRES_PASSWORD={{cookiecutter.postgres_password}}
+      - FIRST_SUPERUSER={{cookiecutter.first_superuser}}
+      - FIRST_SUPERUSER_PASSWORD={{cookiecutter.first_superuser_password}}
+  frontend:
+    image: '{{cookiecutter.docker_image_frontend}}'
+    labels:
+      - "traefik.frontend.rule=PathPrefix:/"
+      - "traefik.enable=true"
+      - "traefik.port=80"
+      - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
+volumes:
+  app-db-data: {}

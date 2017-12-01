@@ -1,0 +1,13 @@
+version: '3'
+services:
+  backend:
+    build: ./backend
+    image: '{{cookiecutter.docker_image_backend}}:stag'
+  celeryworker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-celery-worker
+    image: '{{cookiecutter.docker_image_celeryworker}}:stag'
+  frontend:
+    build: ./backend
+    image: '{{cookiecutter.docker_image_frontend}}:stag'

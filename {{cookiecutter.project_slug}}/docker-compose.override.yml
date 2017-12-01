@@ -1,0 +1,75 @@
+version: '3'
+services:
+  pgadmin:
+    ports:
+      - '5050:5050'
+  swagger-ui:
+    environment:
+      - API_URL=http://{{cookiecutter.domain_dev}}/api/v1/swagger/
+  proxy:
+    ports:
+      - '80:80'
+      - '8080:8080'
+  flower:
+    ports:
+      - '5555:5555'
+  backend:
+    build: 
+      context: ./backend
+      args: 
+        env: dev
+    # ports:
+      #- '80:80'
+      #- '8888:8888'
+    volumes:
+      - './backend/app:/app'
+      # For Hydrogen Jupyter easy integration with
+      # docker-compose exec server
+      # and
+      # jupyter notebook --ip=0.0.0.0 --allow-root
+      - '~/.jupyter:/root/.jupyter'
+    environment:
+      - SERVER_NAME={{cookiecutter.domain_dev}}
+      - FLASK_APP=app/main.py
+      - FLASK_DEBUG=1
+      - 'RUN=flask run --host=0.0.0.0 --port=80'
+      - 'JUPYTER=jupyter notebook --ip=0.0.0.0 --allow-root'
+    command: bash -c "while true; do sleep 1; done"
+    # command: bash -c "flask run --host=0.0.0.0 --port=80"
+  celeryworker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-celery-worker
+      args: 
+        env: dev
+    volumes:
+      - './backend/app:/app'
+  backend-rest-tests:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-rest-tests
+      args: 
+        env: dev
+    environment:
+      - 'JUPYTER=jupyter notebook --ip=0.0.0.0 --allow-root'
+      - SERVER_NAME={{cookiecutter.domain_dev}}
+      - FIRST_SUPERUSER={{cookiecutter.first_superuser}}
+      - FIRST_SUPERUSER_PASSWORD={{cookiecutter.first_superuser_password}}
+      # - SEED=0
+    command: bash -c "while true; do sleep 1; done"
+    volumes:
+      - './backend/app:/app'
+      # For Hydrogen Jupyter easy integration with
+      # docker-compose exec server
+      # and
+      # jupyter notebook --ip=0.0.0.0 --allow-root
+      - '~/.jupyter:/root/.jupyter'
+    ports:
+      - '8888:8888'
+    links:
+      - backend:{{cookiecutter.domain_dev}}
+  frontend:
+    build: ./frontend
+    args: 
+        env: dev
+

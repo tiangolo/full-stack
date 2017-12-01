@@ -1,0 +1,19 @@
+FROM python:3.6
+
+RUN pip install psycopg2 raven pyyaml celery==4.1.0 SQLAlchemy==1.1.13 passlib[bcrypt]
+
+# For development, Jupyter remote kernel, Hydrogen
+# Using inside the container:
+# jupyter notebook --ip=0.0.0.0 --allow-root
+ARG env=prod
+RUN bash -c "if [ $env == 'dev' ] ; then pip install jupyter ; fi"
+EXPOSE 8888
+
+ENV C_FORCE_ROOT=1
+
+COPY ./app /app
+WORKDIR /app
+
+ENV PYTHONPATH=/app
+
+CMD celery worker -A app.worker -l info -Q main-queue -c 1

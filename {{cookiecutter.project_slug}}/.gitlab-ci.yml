@@ -1,0 +1,95 @@
+image: docker:latest
+
+before_script:
+  - apk add --no-cache py-pip
+  - pip install docker-compose
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+
+stages:
+  - test
+  - build
+  - deploy
+
+rest-tests:
+  stage: test
+  script:
+    - docker-compose -f docker-compose.test.yml build
+    - docker-compose -f docker-compose.test.yml up -d
+    - docker-compose -f docker-compose.test.yml exec -T backend-rest-tests pytest
+    - docker-compose -f docker-compose.test.yml down -v
+  tags:
+   - build
+   - test
+
+build-branch:
+  stage: build
+  script:
+    - docker-compose -f docker-compose.branch.build.yml build
+    - docker-compose -f docker-compose.branch.build.yml push
+  except:
+    - master
+    - production
+    - tags
+  tags:
+   - build
+   - test
+
+build-stag:
+  stage: build
+  script:
+    - docker-compose -f docker-compose.stag.build.yml build
+    - docker-compose -f docker-compose.stag.build.yml push
+  only:
+    - master
+  tags:
+   - build
+   - test
+    
+build-prod:
+  stage: build
+  script:
+    - docker-compose -f docker-compose.prod.build.yml build
+    - docker-compose -f docker-compose.prod.build.yml push
+  only:
+    - production
+  tags:
+   - build
+   - test
+
+deploy-branch:
+  stage: deploy
+  script: docker stack deploy -c docker-compose.branch.yml --with-registry-auth {{cookiecutter.docker_swarm_stack_name_branch}}
+  environment:
+    name: staging
+    url: https://{{cookiecutter.domain_branch}}
+  except:
+    - master
+    - production
+    - tags
+  tags:
+    - swarm
+    - branch
+
+deploy-stag:
+  stage: deploy
+  script: docker stack deploy -c docker-compose.stag.yml --with-registry-auth {{cookiecutter.docker_swarm_stack_name_staging}}
+  environment:
+    name: staging
+    url: https://{{cookiecutter.domain_staging}}
+  only:
+    - master
+  tags:
+    - swarm
+    - stag
+
+deploy-prod:
+  stage: deploy
+  script: docker stack deploy -c docker-compose.prod.yml --with-registry-auth {{cookiecutter.docker_swarm_stack_name_main}}
+  environment:
+    name: production
+    url: https://{{cookiecutter.domain_main}}
+  only:
+    - production
+  tags:
+    - swarm
+    - prod

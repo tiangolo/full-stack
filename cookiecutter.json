@@ -1,0 +1,40 @@
+{
+    "project_name": "Base Project",
+    "project_slug": "{{ cookiecutter.project_name|lower|replace(' ', '-') }}",
+    "domain_main": "{{cookiecutter.project_slug}}.com",
+    "domain_staging": "stag.{{cookiecutter.domain_main}}",
+    "domain_branch": "branch.{{cookiecutter.domain_main}}",
+    "domain_dev": "dev.{{cookiecutter.domain_main}}",
+
+    "docker_swarm_stack_name_main": "{{domain_main|replace('.', '-')}}",
+    "docker_swarm_stack_name_staging": "{{domain_staging|replace('.', '-')}}",
+    "docker_swarm_stack_name_branch": "{{domain_branch|replace('.', '-')}}",
+
+    "secret_key": "changethis",
+    "first_superuser": "admin@{{cookiecutter.domain_main}}",
+    "first_superuser_password": "changethis",
+    
+
+    "postgres_password": "changethis",
+    "pgadmin_default_user": "admin@{{cookiecutter.domain_main}}",
+    "pgadmin_default_user_password": "changethis",
+    
+    "traefik_constraint_tag": "{{cookiecutter.domain_main}}",
+    "traefik_constraint_tag_staging": "{{cookiecutter.domain_staging}}",
+    "traefik_constraint_tag_branch": "{{cookiecutter.domain_branch}}",
+    "traefik_public_network": "traefik-public",
+    "traefik_public_constraint_tag": "traefik-public",
+    
+    "flower_auth": "root:changethis",
+    
+    "sentry_dsn": "",
+
+    "docker_image_backend": "backend",
+    "docker_image_celeryworker": "celeryworker",
+    "docker_image_frontend": "frontend",
+
+    "_copy_without_render": [
+        "frontend/src/**/*.html",
+        "frontend/node_modules/*"
+    ]
+}
