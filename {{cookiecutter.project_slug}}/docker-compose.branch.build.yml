@@ -9,5 +9,5 @@ services:
       dockerfile: Dockerfile-celery-worker
     image: '{{cookiecutter.docker_image_celeryworker}}:branch'
   frontend:
-    build: ./backend
+    build: ./frontend
     image: '{{cookiecutter.docker_image_frontend}}:branch'
