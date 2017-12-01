@@ -11,7 +11,8 @@ services:
   queue:
     image: 'rabbitmq:3'
   backend:
-    image: '{{cookiecutter.docker_image_backend}}'
+    build:
+      context: ./backend
     depends_on: 
       - db
     environment:
@@ -27,7 +28,9 @@ services:
       - "traefik.port=80"
       - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
   celeryworker:
-    image: '{{cookiecutter.docker_image_celeryworker}}'
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-celery-worker
     depends_on: 
       - db
       - queue
