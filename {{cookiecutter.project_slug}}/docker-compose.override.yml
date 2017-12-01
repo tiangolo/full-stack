@@ -69,7 +69,8 @@ services:
     links:
       - backend:{{cookiecutter.domain_dev}}
   frontend:
-    build: ./frontend
-    args: 
-        env: dev
+    build: 
+      context: ./frontend
+      args: 
+          env: dev
 
