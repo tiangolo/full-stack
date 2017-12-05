@@ -42,8 +42,16 @@ services:
       dockerfile: Dockerfile-celery-worker
       args: 
         env: dev
+    environment:
+      - 'RUN=celery worker -A app.worker -l info -Q main-queue -c 1'
+      - 'JUPYTER=jupyter notebook --ip=0.0.0.0 --allow-root'
     volumes:
       - './backend/app:/app'
+      # For Hydrogen Jupyter easy integration with
+      # docker-compose exec server
+      # and
+      # jupyter notebook --ip=0.0.0.0 --allow-root
+      - '~/.jupyter:/root/.jupyter'
   backend-rest-tests:
     build:
       context: ./backend
