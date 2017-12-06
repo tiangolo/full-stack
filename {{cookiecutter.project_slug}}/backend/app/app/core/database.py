@@ -5,7 +5,6 @@ from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from . import config
 from .security import pwd_context
 
-# TODO make it an env var
 engine = create_engine(
     f'postgresql://postgres:{config.POSTGRES_PASSWORD}@db/app',
     convert_unicode=True)
