@@ -72,7 +72,7 @@ docker-compose exec server bash
 * After changing a model (for example, adding a column), inside the container, create a revision, e.g.:
 
 ```bash
-alembic revision -m "Add column last_name to User model"
+alembic revision --autogenerate -m "Add column last_name to User model"
 ```
 
 * Commit to the git repository the files generated in the alembic directory.
