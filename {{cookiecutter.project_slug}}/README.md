@@ -21,7 +21,7 @@ docker-compose up -d
 * Start an interactive session in the server container that is running an infinite loop doing nothing:
 
 ```bash
-docker-compose exec server bash
+docker-compose exec backend bash
 ```
 
 * Run the local debugging Flask server, all the command is in the `RUN` environment variable:
