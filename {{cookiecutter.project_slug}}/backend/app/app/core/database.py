@@ -21,10 +21,12 @@ class Base(object):
 Base = declarative_base(cls=Base)
 Base.query = db_session.query_property()
 
+# Import all the models, so that Base has them before being
+# imported by Alembic or used by init_db()
+from app.models.user import User
+from app.models.group import Group
 
 def init_db():
-    from app.models.user import User
-    from app.models.group import Group
     Base.metadata.create_all(bind=engine)
 
     group = db_session.query(Group).filter(Group.name == 'default').first()
