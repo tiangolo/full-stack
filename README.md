@@ -92,6 +92,12 @@ The input variables, with their default values (some auto generated) are:
 * `docker_image_celeryworker`: Docker image for the celery worker. By default, based on your Docker image prefix.
 * `docker_image_frontend`: Docker image for the front end. By default, based on your Docker image prefix.
 
+## How to deploy
+
+This stack can be adjusted and used with several deployment options that are compatible with Docker Compose, but it is designed to be used in a cluster controlled with pure Docker in Swarm Mode with a Traefik main load balancer proxy.
+
+Read the [**Guide to deploy a Docker Swarm Mode Cluster**](docker-swarm-cluster-deploy.md) in this repository.
+
 ## License
 
 This project is licensed under the terms of the MIT license.
