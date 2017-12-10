@@ -1,4 +1,4 @@
-# New server setup
+# Cluster setup with Docker Swarm Mode and Traefik
 
 This guide shows you how to create a cluster of Linux servers managed with Docker Swarm mode to deploy your projects.
 
