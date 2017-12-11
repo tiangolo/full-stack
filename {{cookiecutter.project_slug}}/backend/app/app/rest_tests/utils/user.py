@@ -30,3 +30,17 @@ def user_authentication_headers(server_api, email, password):
     auth_token = response['access_token']
     headers = {'Authorization': f'Bearer {auth_token}'}
     return headers
+
+
+def create_user(server_api, superuser_token_headers, user_data):
+    r = requests.post(
+        f'{server_api}{config.API_V1_STR}/users/',
+        headers=superuser_token_headers,
+        json=user_data)
+    created_user = r.json()
+    return created_user
+
+
+def create_random_user(server_api, superuser_token_headers):
+    user_data = random_user()
+    return create_user(server_api, superuser_token_headers, user_data)
