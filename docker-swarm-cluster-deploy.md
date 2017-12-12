@@ -214,9 +214,14 @@ docker service create \
 ```
 
 
-## GitLab Runner
+## GitLab Runner in Docker
 
-If you use GitLab and want to integrate Continuous Integration / Continuous Deployment, you can follow this section.
+If you use GitLab and want to integrate Continuous Integration / Continuous Deployment, you can follow this section to install the GitLab runner.
+
+There is a sub-section with how to install it in Docker Swarm mode and one in Docker standalone mode.
+
+
+### Create the GitLab Runner in Docker Swarm mode
 
 To install a GitLab runner in Docker Swarm mode run:
 
@@ -263,6 +268,33 @@ Complete the command with the [GitLab Runner registration setup](https://docs.gi
 docker exec -it gitlab-runner.1.eybbh93lasdfvvnasdfh7 bash
 ```
 
+Continue below in the seciton **Install the GitLab Runner**.
+
+### Create the GitLab Runner in Docker standalone mode
+
+You might want to run a GitLab runner in Docker standalone, for example, run the tests in a standalone server and deploy in a Docker Swarm mode cluster. 
+
+To install a GitLab runner in a standalone Docker run:
+
+```bash
+docker run -d \
+    --name gitlab-runner \
+    --restart always \
+    -v gitlab-runner:/etc/gitlab-runner \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    gitlab/gitlab-runner:latest
+```
+
+Then, enter into that container:
+
+```bash
+docker exec -it gitlab-runner bash
+```
+
+Continue below in the seciton **Install the GitLab Runner**.
+
+### Install the GitLab Runner
+
 * Go to the GitLab "Admin Area -> Runners" section.
 * Get the URL and create a variable in your Docker Manager's Terminal, e.g.:
 
@@ -282,12 +314,12 @@ export GITLAB_TOKEN=WYasdfJp4sdfasdf1234
 gitlab-runner \
     register -n \
     --name "Docker Runner" \
-    --tag-list dog-cat-cluster,stag,prod \
     --executor docker \
     --docker-image docker:latest \
     --docker-volumes /var/run/docker.sock:/var/run/docker.sock \
     --url $GITLAB_URL \
-    --registration-token $GITLAB_TOKEN
+    --registration-token $GITLAB_TOKEN \
+    --tag-list dog-cat-cluster,stag,prod
 ```
 
 * You can edit the runner more from the GitLab admin section.
