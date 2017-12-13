@@ -14,7 +14,9 @@ rest-tests:
   stage: test
   script:
     - docker-compose -f docker-compose.test.yml build
+    - docker-compose -f docker-compose.test.yml down -v # Remove possibly previous broken stacks left hanging after an error
     - docker-compose -f docker-compose.test.yml up -d
+    - sleep 20; # Give some time for the DB and prestart script to finish
     - docker-compose -f docker-compose.test.yml exec -T backend-rest-tests pytest
     - docker-compose -f docker-compose.test.yml down -v
   tags:
