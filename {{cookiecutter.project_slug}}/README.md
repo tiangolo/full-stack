@@ -24,6 +24,8 @@ docker-compose up -d
 docker-compose exec backend bash
 ```
 
+**Note**: Before the first run, make sure you create at least one "revision" of your models and database and make sure you create those models / tables in the database with `alembic`. See the section about migrations below for specific instructions.
+
 * Run the local debugging Flask server, all the command is in the `RUN` environment variable:
 
 ```bash
@@ -37,6 +39,8 @@ Add and modify SQLAlchemy models to `./backend/app/app/models/`, Marshmallow sch
 Add and modify tasks to the Celery worker in `./backend/app/app/worker.py`. 
 
 If you need to install any additional package to the worker, add it to the file `./backend/app/Dockerfile-celery-worker`.
+
+The `docker-compose.override.yml` file for local development has a host volume with your app files inside the container for rapid iteration. So you can update your code and it will be the same code (updated) inside the container. You just have to restart the server, but you don't need to rebuild the image to test a change. Make sure you use this only for local development. Your final production images should be built with the latest version of your code and do not depend on host volumes mounted.
 
 
 ### Back end tests
@@ -63,13 +67,17 @@ If you use GitLab CI the tests will run automatically.
 
 ### Migrations
 
+As the `docker-compose.override.yml` file for local development mounts your app directory as a volume inside the container, you can also run the migrations with `alembic` commands inside the container and the migration code will be in your app directory (instead of being only inside the container). So you can add it to your git repository.
+
+Make sure you create at least one "revision" of your models and that you "upgrade" your database with that revision at least once. As this is what will create the tables in your database. Otherwise, your application won't run.
+
 * Start an interactive session in the server container that is running an infinite loop doing nothing:
 
 ```bash
 docker-compose exec server bash
 ```
 
-* After changing a model (for example, adding a column), inside the container, create a revision, e.g.:
+* After changing a model (for example, adding a column) or when you are just starting, inside the container, create a revision, e.g.:
 
 ```bash
 alembic revision --autogenerate -m "Add column last_name to User model"
@@ -81,6 +89,12 @@ alembic revision --autogenerate -m "Add column last_name to User model"
 
 ```bash
 alembic upgrade head
+```
+
+If you don't want to use migrations at all, uncomment the line in the file at `./backend/app/app/core/database.py` with:
+
+```python
+Base.metadata.create_all(bind=engine)
 ```
 
 ## Front end development
