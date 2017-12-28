@@ -18,6 +18,10 @@ services:
       context: ./backend
       args: 
         env: dev
+    networks: 
+      default: 
+        aliases: 
+          - {{cookiecutter.domain_dev}}
     # ports:
       #- '80:80'
       #- '8888:8888'
@@ -74,8 +78,6 @@ services:
       - '~/.jupyter:/root/.jupyter'
     ports:
       - '8888:8888'
-    links:
-      - backend:{{cookiecutter.domain_dev}}
   frontend:
     build: 
       context: ./frontend
