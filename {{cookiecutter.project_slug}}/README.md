@@ -74,7 +74,7 @@ Make sure you create at least one "revision" of your models and that you "upgrad
 * Start an interactive session in the server container that is running an infinite loop doing nothing:
 
 ```bash
-docker-compose exec server bash
+docker-compose exec backend bash
 ```
 
 * After changing a model (for example, adding a column) or when you are just starting, inside the container, create a revision, e.g.:
