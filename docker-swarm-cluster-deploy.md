@@ -153,6 +153,7 @@ docker service create \
     --acme.onhostrule=true \
     --acme.acmelogging=true \
     --logLevel=DEBUG \
+    --accessLog \
     --web
 ```
 
