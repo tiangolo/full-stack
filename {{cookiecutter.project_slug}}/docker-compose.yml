@@ -38,6 +38,7 @@ services:
       --docker.exposedbydefault=false \
       --constraints=tag=={{cookiecutter.traefik_constraint_tag}} \
       --logLevel=DEBUG \
+      --accessLog \
       --web
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
