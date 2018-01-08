@@ -1,3 +1,6 @@
+# Import standard library
+from datetime import timedelta
+
 # Import installed modules
 from flask import abort
 from flask_apispec import doc, use_kwargs, marshal_with
@@ -8,7 +11,7 @@ from webargs import fields
 
 # Import app code
 from app.main import app
-from ..api_docs import docs, authorization_headers
+from ..api_docs import docs, security_params
 from app.core import config
 from app.core.security import pwd_context
 from app.core.database import db_session
@@ -21,23 +24,33 @@ from app.models.user import User
 
 @docs.register
 @doc(
-    description='Login user, get an access token for future requests',
+    description=
+    'OAuth2 compatible token login, get an access token for future requests',
     tags=['login'])
-@app.route(f'{config.API_V1_STR}/login/', methods=['POST'])
+@app.route(f'{config.API_V1_STR}/login/access-token', methods=['POST'])
 @use_kwargs({
-    'email': fields.Str(required=True),
+    'username': fields.Str(required=True),
     'password': fields.Str(required=True),
 })
 @marshal_with(TokenSchema())
-def route_login(email=None, password=None):
-    user = db_session.query(User).filter(User.email == email).first()
+def route_login_access_token(username, password):
+    user = db_session.query(User).filter(User.email == username).first()
     if not user or not pwd_context.verify(password, user.password):
         abort(400, 'Incorrect email or password')
-    elif not user.active:
+    elif not user.is_active:
         abort(400, 'Inactive user')
+    access_token_expires = timedelta(
+        minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_token_expires = timedelta(days=config.REFRESH_TOKEN_EXPIRE_DAYS)
     return {
-        'access_token': create_access_token(identity=user.id),
-        'refresh_token': create_refresh_token(identity=user.id)
+        'access_token':
+        create_access_token(
+            identity=user.id, expires_delta=access_token_expires),
+        'refresh_token':
+        create_refresh_token(
+            identity=user.id, expires_delta=refresh_token_expires),
+        'token_type':
+        'bearer',
     }
 
 
@@ -56,27 +69,26 @@ def route_login(email=None, password=None):
     locations=['headers'])
 @marshal_with(TokenSchema(only=['access_token']))
 @jwt_refresh_token_required
-def route_refresh_token():
+def route_refresh_token(**kwargs):
     user = get_current_user()
     if not user:
         abort(400, 'Could not authenticate user with provided token')
-    elif not user.active:
+    elif not user.is_active:
         abort(400, 'Inactive user')
-    access_token = create_access_token(identity=user.id)
-    print(f'access_token: {access_token}')
+    access_token_expires = timedelta(
+        minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        identity=user.id, expires_delta=access_token_expires)
     return {'access_token': access_token}
 
 
 @docs.register
-@doc(
-    description='Test token access',
-    params=authorization_headers,
-    tags=['login'])
+@doc(description='Test token access', tags=['login'], security=security_params)
 @app.route(f'{config.API_V1_STR}/login/test-token', methods=['POST'])
 @use_kwargs({'test': fields.Str(required=True)})
 @marshal_with(UserSchema())
 @jwt_required
-def route_test_token():
+def route_test_token(test):
     current_user = get_current_user()
     if current_user:
         return current_user
