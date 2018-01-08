@@ -1,5 +1,7 @@
 # Base Project
 
+[![Build Status](https://travis-ci.org/senseta-os/senseta-base-project.svg?branch=master)](https://travis-ci.org/senseta-os/senseta-base-project)
+
 Generate a basic back end and front end stack.
 
 ## Features
