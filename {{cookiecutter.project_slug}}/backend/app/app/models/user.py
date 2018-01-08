@@ -22,7 +22,7 @@ class User(Base):
     last_name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     password = Column(String)
-    active = Column(Boolean(), default=True)
+    is_active = Column(Boolean(), default=True)
     is_superuser = Column(Boolean(), default=False)
     # Relationships
     group_id = Column(Integer, ForeignKey('group.id'), index=True)
