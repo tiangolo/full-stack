@@ -16,17 +16,19 @@ def random_user(group_id=1):
         'email': email,
         'app_id': app_id,
         'group_id': group_id,
-        'password': 'pstest'
+        'password': 'passwordtest'
     }
     return fake_user
 
 
 def user_authentication_headers(server_api, email, password):
-    data = {"email": email, "password": password}
+    data = {"username": email, "password": password}
 
-    r = requests.post(f'{server_api}{config.API_V1_STR}/login/', data=data)
+    r = requests.post(
+        f'{server_api}{config.API_V1_STR}/login/access-token', json=data)
 
     response = r.json()
+    print(response)
     auth_token = response['access_token']
     headers = {'Authorization': f'Bearer {auth_token}'}
     return headers

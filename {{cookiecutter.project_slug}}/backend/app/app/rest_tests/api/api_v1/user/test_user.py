@@ -12,7 +12,7 @@ def test_get_users_superuser_me(server_api, superuser_token_headers):
         headers=superuser_token_headers)
     current_user = r.json()
 
-    assert current_user['active'] == True
+    assert current_user['is_active'] == True
     assert current_user['email'] == config.FIRST_SUPERUSER
     assert current_user['is_superuser'] == True
 
@@ -124,7 +124,7 @@ def test_create_user_by_superuser(server_api, superuser_token_headers):
 
     expected_fields = [
         "id",
-        "active",
+        "is_active",
         "created_at",
         "email",
         "first_name",
@@ -162,7 +162,7 @@ def test_create_user_by_superuser_any_group(server_api,
 
     expected_fields = [
         "id",
-        "active",
+        "is_active",
         "created_at",
         "email",
         "first_name",
