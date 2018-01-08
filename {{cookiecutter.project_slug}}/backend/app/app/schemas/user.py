@@ -16,7 +16,7 @@ class UserSchema(BaseSchema):
     first_name = fields.Str()
     last_name = fields.Str()
     email = fields.Email()
-    active = fields.Bool()
+    is_active = fields.Bool()
     is_superuser = fields.Bool()
     group = fields.Nested(GroupSchema, only=('id', 'name'))
     groups_admin = fields.Nested(
