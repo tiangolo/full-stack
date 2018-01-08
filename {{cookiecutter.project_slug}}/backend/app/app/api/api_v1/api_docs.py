@@ -29,15 +29,3 @@ docs = FlaskApiSpec(app)
 
 security_params = [{'bearer': []}]
 
-authorization_headers = {
-    'Authorization': {
-        'description':
-        'Authorization HTTP header with JWT token, like: Authorization: Bearer asdf.qwer.zxcv',
-        'in':
-        'header',
-        'type':
-        'string',
-        'required':
-        True
-    }
-}
