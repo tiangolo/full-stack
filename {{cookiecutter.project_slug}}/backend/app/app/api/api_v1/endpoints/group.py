@@ -11,7 +11,7 @@ from flask_jwt_extended import (get_current_user, jwt_required)
 
 # Import app code
 from app.main import app
-from app.api.api_v1.api_docs import docs, authorization_headers
+from app.api.api_v1.api_docs import docs, security_params
 from app.core import config
 from app.core.database import db_session
 from app.core.celery_app import celery_app
@@ -26,7 +26,7 @@ from app.models.user import User
 @docs.register
 @doc(
     description='Create a new group',
-    params=authorization_headers,
+    security=security_params,
     tags=['groups'])
 @app.route(f'{config.API_V1_STR}/groups/', methods=['POST'])
 @use_kwargs({
@@ -38,7 +38,7 @@ def route_groups_post(name=None):
     current_user = get_current_user()
     if not current_user:
         abort(400, 'Could not authenticate user with provided token')
-    elif not current_user.active:
+    elif not current_user.is_active:
         abort(400, 'Inactive user')
     elif not current_user.is_superuser:
         abort(400, 'Not a superuser')
@@ -55,7 +55,7 @@ def route_groups_post(name=None):
 @docs.register
 @doc(
     description='Retrieve the groups of the user',
-    params=authorization_headers,
+    security=security_params,
     tags=['groups'])
 @app.route(f'{config.API_V1_STR}/groups/', methods=['GET'])
 @marshal_with(
@@ -66,7 +66,7 @@ def route_groups_get():
 
     if not current_user:
         abort(400, 'Could not authenticate user with provided token')
-    elif not current_user.active:
+    elif not current_user.is_active:
         abort(400, 'Inactive user')
 
     if current_user.is_superuser:
@@ -80,7 +80,7 @@ def route_groups_get():
 @docs.register
 @doc(
     description='Assign user as group Admin',
-    params=authorization_headers,
+    security=security_params,
     tags=[
         'groups',
     ])
@@ -95,7 +95,7 @@ def route_admin_users_groups_post(group_id=None, user_id=None):
 
     if not current_user:
         abort(400, 'Could not authenticate user with provided token')
-    elif not current_user.active:
+    elif not current_user.is_active:
         abort(400, 'Inactive user')
 
     group = db_session.query(Group).filter_by(
