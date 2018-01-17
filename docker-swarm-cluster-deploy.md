@@ -138,7 +138,7 @@ docker service create \
     --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
     --mount type=volume,source=traefik-public-certificates,target=/certificates \
     --network traefik-public \
-    traefik \
+    traefik:v1.5 \
     --docker \
     --docker.swarmmode \
     --docker.watch \
@@ -150,6 +150,7 @@ docker service create \
     --acme.email=$EMAIL \
     --acme.storage=/certificates/acme.json \
     --acme.entryPoint=https \
+    --acme.httpChallenge.entryPoint=http\
     --acme.onhostrule=true \
     --acme.acmelogging=true \
     --logLevel=DEBUG \
