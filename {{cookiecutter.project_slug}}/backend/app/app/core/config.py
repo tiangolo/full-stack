@@ -2,8 +2,6 @@ import os
 
 API_V1_STR = '/api/v1'
 
-CONTENT_TYPE_JSON = 'application/json'
-
 SECRET_KEY = os.getenvb(b'SECRET_KEY')
 if not SECRET_KEY:
     SECRET_KEY = os.urandom(32)
