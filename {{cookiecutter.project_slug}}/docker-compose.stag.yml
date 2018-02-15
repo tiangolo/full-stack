@@ -24,7 +24,11 @@ services:
         - "traefik.port=5050"
         - "traefik.tags={{cookiecutter.traefik_public_constraint_tag}}"
         - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
-        - "traefik.frontend.entryPoints=http,https"
+        # Traefik service that listens to HTTP
+        - "traefik.redirectorservice.frontend.entryPoints=http"
+        - "traefik.redirectorservice.frontend.redirect.entryPoint=https"
+        # Traefik service that listens to HTTPS
+        - "traefik.webservice.frontend.entryPoints=https"
     networks:
       - {{cookiecutter.traefik_public_network}}
       - default
@@ -39,7 +43,7 @@ services:
         - "traefik.port=8080"
         - "traefik.tags={{cookiecutter.traefik_constraint_tag_staging}}"
   proxy:
-    image: traefik:v1.4
+    image: traefik:v1.5
     command: --docker \
       --docker.swarmmode \
       --docker.watch \
@@ -59,7 +63,11 @@ services:
         - "traefik.port=80"
         - "traefik.tags={{cookiecutter.traefik_public_constraint_tag}}"
         - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
-        - "traefik.frontend.entryPoints=http,https"
+        # Traefik service that listens to HTTP
+        - "traefik.redirectorservice.frontend.entryPoints=http"
+        - "traefik.redirectorservice.frontend.redirect.entryPoint=https"
+        # Traefik service that listens to HTTPS
+        - "traefik.webservice.frontend.entryPoints=https"
     networks:
       - {{cookiecutter.traefik_public_network}}
       - default
@@ -74,7 +82,11 @@ services:
         - "traefik.port=5555"
         - "traefik.tags={{cookiecutter.traefik_public_constraint_tag}}"
         - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
-        - "traefik.frontend.entryPoints=http,https"
+        # Traefik service that listens to HTTP
+        - "traefik.redirectorservice.frontend.entryPoints=http"
+        - "traefik.redirectorservice.frontend.redirect.entryPoint=https"
+        # Traefik service that listens to HTTPS
+        - "traefik.webservice.frontend.entryPoints=https"
     networks:
       - {{cookiecutter.traefik_public_network}}
       - default
