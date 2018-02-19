@@ -51,6 +51,7 @@ You will be asked to provide passwords and secret keys for several components. O
 
 ```bash
 openssl rand -hex 32
+# Outputs something like: 99d3b1f01aa639e4a76f4fc281fc834747a543720ba4c8a8648ba755aef9be7f
 ```
 
 Copy the contents and use that as password / secret key. And run that again to generate another secure key.
