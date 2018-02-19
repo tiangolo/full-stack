@@ -32,7 +32,7 @@ services:
       - "traefik.port=8080"
       - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
   proxy:
-    image: traefik:v1.4
+    image: traefik:v1.5
     command: --docker \
       --docker.watch \
       --docker.exposedbydefault=false \
