@@ -38,7 +38,8 @@ apt-get update
 apt-get upgrade -y
 ```
 
-* Install Docker:
+* Install Docker following the official guide: https://docs.docker.com/install/
+* Or alternatively, run the official convenience script, but have in mind that it would install the `edge` version:
 
 ```bash
 # Download Docker
