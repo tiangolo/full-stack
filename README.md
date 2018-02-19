@@ -50,7 +50,7 @@ cookiecutter https://github.com/senseta-os/base-project
 You will be asked to provide passwords and secret keys for several components. Open another terminal and run:
 
 ```bash
-< /dev/urandom tr -dc A-Za-z0-9 | head -c${1:-32};echo;
+openssl rand -hex 32
 ```
 
 Copy the contents and use that as password / secret key. And run that again to generate another secure key.
