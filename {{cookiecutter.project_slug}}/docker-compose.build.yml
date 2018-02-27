@@ -1,0 +1,12 @@
+version: '3'
+services:
+  backend:
+    build: 
+      context: ./backend
+  celeryworker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-celery-worker
+  frontend:
+    build: 
+      context: ./frontend

@@ -1,53 +1,11 @@
 version: '3'
 services:
-  db:
-    image: 'postgres:10'
-    environment:
-      POSTGRES_DB: app
-      POSTGRES_PASSWORD: {{cookiecutter.postgres_password}}
-      PGDATA: /var/lib/postgresql/data/pgdata
-    volumes:
-      - 'app-db-data:/var/lib/postgresql/data/pgdata'
-  queue:
-    image: 'rabbitmq:3'
-  backend:
-    build:
-      context: ./backend
-    depends_on: 
-      - db
-    environment:
-      - SERVER_NAME=backend
-      - SECRET_KEY={{cookiecutter.secret_key}}
-      - SENTRY_DSN={{cookiecutter.sentry_dsn}}
-      - POSTGRES_PASSWORD={{cookiecutter.postgres_password}}
-      - FIRST_SUPERUSER={{cookiecutter.first_superuser}}
-      - FIRST_SUPERUSER_PASSWORD={{cookiecutter.first_superuser_password}}
-    labels:
-      - "traefik.frontend.rule=PathPrefix:/api"
-      - "traefik.enable=true"
-      - "traefik.port=80"
-      - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
-  celeryworker:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile-celery-worker
-    depends_on: 
-      - db
-      - queue
-    environment:
-      - SENTRY_DSN={{cookiecutter.sentry_dsn}}
-      - POSTGRES_PASSWORD={{cookiecutter.postgres_password}}
-      - FIRST_SUPERUSER={{cookiecutter.first_superuser}}
-      - FIRST_SUPERUSER_PASSWORD={{cookiecutter.first_superuser_password}}
   backend-rest-tests:
     build:
       context: ./backend
       dockerfile: Dockerfile-rest-tests
     command: bash -c "while true; do sleep 1; done"
     environment:
-      - SERVER_NAME=backend
+      - SERVER_NAME=${DOMAIN}
       - FIRST_SUPERUSER={{cookiecutter.first_superuser}}
       - FIRST_SUPERUSER_PASSWORD={{cookiecutter.first_superuser_password}}
-      # - SEED=0
-volumes:
-  app-db-data: {}
