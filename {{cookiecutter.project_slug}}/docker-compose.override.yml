@@ -8,14 +8,14 @@ services:
       - "traefik.frontend.rule=PathPrefixStrip:/swagger/"
       - "traefik.enable=true"
       - "traefik.port=8080"
-      - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
+      - "traefik.tags=${TRAEFIK_TAG}"
     environment:
       - API_URL=http://${DOMAIN}/api/v1/swagger/
   proxy:
     command: --docker \
       --docker.watch \
       --docker.exposedbydefault=false \
-      --constraints=tag=={{cookiecutter.traefik_constraint_tag}} \
+      --constraints=tag==${TRAEFIK_TAG} \
       --logLevel=DEBUG \
       --accessLog \
       --web
@@ -23,13 +23,7 @@ services:
       - "traefik.frontend.rule=Host:${DOMAIN}"
       - "traefik.enable=true"
       - "traefik.port=80"
-      # - "traefik.tags={{cookiecutter.traefik_public_constraint_tag}}"
-      # - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
-      # # Traefik service that listens to HTTP
-      # - "traefik.redirectorservice.frontend.entryPoints=http"
-      # - "traefik.redirectorservice.frontend.redirect.entryPoint=https"
-      # # Traefik service that listens to HTTPS
-      # - "traefik.webservice.frontend.entryPoints=https"
+
     ports:
       - '80:80'
       - '8080:8080'
@@ -45,7 +39,7 @@ services:
       - "traefik.frontend.rule=PathPrefix:/api"
       - "traefik.enable=true"
       - "traefik.port=80"
-      - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
+      - "traefik.tags=${TRAEFIK_TAG}"
     networks: 
       default: 
         aliases: 
@@ -112,4 +106,4 @@ services:
       - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.enable=true"
       - "traefik.port=80"
-      - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
+      - "traefik.tags=${TRAEFIK_TAG}"

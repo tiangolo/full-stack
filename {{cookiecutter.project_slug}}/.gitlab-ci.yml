@@ -63,7 +63,7 @@ build-prod:
 deploy-branch:
   stage: deploy
   script: 
-    - DOMAIN={{cookiecutter.domain_branch}} TAG=branch docker-compose -f docker-compose.yml -f docker-compose.admin.yml -f docker-compose.images.yml -f docker-compose.deploy.yml config > docker-stack.yml
+    - DOMAIN={{cookiecutter.domain_branch}} TRAEFIK_TAG={{cookiecutter.traefik_constraint_tag_branch}} TRAEFIK_PUBLIC_TAG={{cookiecutter.traefik_public_constraint_tag}} TRAEFIK_PUBLIC_NETWORK={{cookiecutter.traefik_public_network}} TAG=branch docker-compose -f docker-compose.yml -f docker-compose.admin.yml -f docker-compose.images.yml -f docker-compose.deploy.yml config > docker-stack.yml
     - docker stack deploy -c docker-stack.yml --with-registry-auth {{cookiecutter.docker_swarm_stack_name_branch}}
   environment:
     name: branch
@@ -79,7 +79,7 @@ deploy-branch:
 deploy-stag:
   stage: deploy
   script: 
-    - DOMAIN={{cookiecutter.domain_staging}} TAG=stag docker-compose -f docker-compose.yml -f docker-compose.admin.yml -f docker-compose.images.yml -f docker-compose.deploy.yml config > docker-stack.yml
+    - DOMAIN={{cookiecutter.domain_staging}} TRAEFIK_TAG={{cookiecutter.traefik_constraint_tag_staging}} TRAEFIK_PUBLIC_TAG={{cookiecutter.traefik_public_constraint_tag}} TRAEFIK_PUBLIC_NETWORK={{cookiecutter.traefik_public_network}} TAG=stag docker-compose -f docker-compose.yml -f docker-compose.admin.yml -f docker-compose.images.yml -f docker-compose.deploy.yml config > docker-stack.yml
     - docker stack deploy -c docker-stack.yml --with-registry-auth {{cookiecutter.docker_swarm_stack_name_staging}}
   environment:
     name: staging
@@ -93,7 +93,7 @@ deploy-stag:
 deploy-prod:
   stage: deploy
   script:
-    - DOMAIN={{cookiecutter.domain_main}} TAG=prod docker-compose -f docker-compose.yml -f docker-compose.admin.yml -f docker-compose.images.yml -f docker-compose.deploy.yml config > docker-stack.yml
+    - DOMAIN={{cookiecutter.domain_main}} TRAEFIK_TAG={{cookiecutter.traefik_constraint_tag}} TRAEFIK_PUBLIC_TAG={{cookiecutter.traefik_public_constraint_tag}} TRAEFIK_PUBLIC_NETWORK={{cookiecutter.traefik_public_network}} TAG=prod docker-compose -f docker-compose.yml -f docker-compose.admin.yml -f docker-compose.images.yml -f docker-compose.deploy.yml config > docker-stack.yml
     - docker stack deploy -c docker-stack.yml --with-registry-auth {{cookiecutter.docker_swarm_stack_name_main}}
   environment:
     name: production

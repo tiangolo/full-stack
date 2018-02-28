@@ -9,15 +9,15 @@ services:
         - "traefik.frontend.rule=Host:pgadmin.${DOMAIN}"
         - "traefik.enable=true"
         - "traefik.port=5050"
-        - "traefik.tags={{cookiecutter.traefik_public_constraint_tag}}"
-        - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
+        - "traefik.tags=${TRAEFIK_PUBLIC_TAG}"
+        - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
         # Traefik service that listens to HTTP
         - "traefik.redirectorservice.frontend.entryPoints=http"
         - "traefik.redirectorservice.frontend.redirect.entryPoint=https"
         # Traefik service that listens to HTTPS
         - "traefik.webservice.frontend.entryPoints=https"
     networks:
-      - {{cookiecutter.traefik_public_network}}
+      - ${TRAEFIK_PUBLIC_NETWORK}
       - default
   swagger-ui:
     deploy:
@@ -25,7 +25,7 @@ services:
       - "traefik.frontend.rule=PathPrefixStrip:/swagger/"
       - "traefik.enable=true"
       - "traefik.port=8080"
-      - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
+      - "traefik.tags=${TRAEFIK_TAG}"
     environment:
       - API_URL=https://${DOMAIN}/api/v1/swagger/
   proxy:
@@ -33,7 +33,7 @@ services:
       --docker.swarmmode \
       --docker.watch \
       --docker.exposedbydefault=false \
-      --constraints=tag=={{cookiecutter.traefik_constraint_tag}} \
+      --constraints=tag==${TRAEFIK_TAG} \
       --logLevel=DEBUG \
       --accessLog \
       --web
@@ -44,15 +44,15 @@ services:
         - "traefik.frontend.rule=Host:${DOMAIN}"
         - "traefik.enable=true"
         - "traefik.port=80"
-        - "traefik.tags={{cookiecutter.traefik_public_constraint_tag}}"
-        - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
+        - "traefik.tags=${TRAEFIK_PUBLIC_TAG}"
+        - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
         # Traefik service that listens to HTTP
         - "traefik.redirectorservice.frontend.entryPoints=http"
         - "traefik.redirectorservice.frontend.redirect.entryPoint=https"
         # Traefik service that listens to HTTPS
         - "traefik.webservice.frontend.entryPoints=https"
     networks:
-      - {{cookiecutter.traefik_public_network}}
+      - ${TRAEFIK_PUBLIC_NETWORK}
       - default
   flower:
     deploy:
@@ -60,15 +60,15 @@ services:
         - "traefik.frontend.rule=Host:flower.${DOMAIN}"
         - "traefik.enable=true"
         - "traefik.port=5555"
-        - "traefik.tags={{cookiecutter.traefik_public_constraint_tag}}"
-        - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
+        - "traefik.tags=${TRAEFIK_PUBLIC_TAG}"
+        - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
         # Traefik service that listens to HTTP
         - "traefik.redirectorservice.frontend.entryPoints=http"
         - "traefik.redirectorservice.frontend.redirect.entryPoint=https"
         # Traefik service that listens to HTTPS
         - "traefik.webservice.frontend.entryPoints=https"
     networks:
-      - {{cookiecutter.traefik_public_network}}
+      - ${TRAEFIK_PUBLIC_NETWORK}
       - default
   backend:
     deploy:
@@ -76,18 +76,18 @@ services:
         - "traefik.frontend.rule=PathPrefix:/api"
         - "traefik.enable=true"
         - "traefik.port=80"
-        - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
+        - "traefik.tags=${TRAEFIK_TAG}"
   frontend:
     deploy:
       labels:
         - "traefik.frontend.rule=PathPrefix:/"
         - "traefik.enable=true"
         - "traefik.port=80"
-        - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
+        - "traefik.tags=${TRAEFIK_TAG}"
 
 volumes:
   app-db-data: {}
 
 networks:
-  {{cookiecutter.traefik_public_network}}:
+  ${TRAEFIK_PUBLIC_NETWORK}:
     external: true
