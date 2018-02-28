@@ -3,6 +3,9 @@ services:
   db:
     volumes:
       - 'app-db-data:/var/lib/postgresql/data/pgdata'
+    deploy:
+      placement:
+        constraints: ['node.labels.${STACK_NAME}.app-db-data == true']
   pgadmin:
     deploy:
       labels:
