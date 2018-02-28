@@ -8,13 +8,13 @@ install:
 services:
   - docker
 
-before_script:
-- cookiecutter --config-file ./testing-config.yml --no-input -f ./
-- cd ./testing-project
-- docker-compose -f docker-compose.test.yml build
-- docker-compose -f docker-compose.test.yml up -d
-- sleep 20
-- docker-compose -f docker-compose.test.yml exec -T backend bash -c 'alembic revision --autogenerate -m "Testing" && alembic upgrade head'
+# before_script:
+# - cookiecutter --config-file ./testing-config.yml --no-input -f ./
+# - cd ./testing-project
+# - docker-compose -f docker-compose.test.yml build
+# - docker-compose -f docker-compose.test.yml up -d
+# - sleep 20
+# - docker-compose -f docker-compose.test.yml exec -T backend bash -c 'alembic revision --autogenerate -m "Testing" && alembic upgrade head'
 
 script:
-- docker-compose -f docker-compose.test.yml exec -T backend-rest-tests pytest
+- test.sh
