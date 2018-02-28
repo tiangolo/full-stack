@@ -28,8 +28,4 @@ services:
       - FIRST_SUPERUSER={{cookiecutter.first_superuser}}
       - FIRST_SUPERUSER_PASSWORD={{cookiecutter.first_superuser_password}}
   frontend:
-    labels:
-      - "traefik.frontend.rule=PathPrefix:/"
-      - "traefik.enable=true"
-      - "traefik.port=80"
-      - "traefik.tags={{cookiecutter.traefik_constraint_tag}}"
+
