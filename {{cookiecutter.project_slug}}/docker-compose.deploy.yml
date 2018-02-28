@@ -10,14 +10,14 @@ services:
         - "traefik.enable=true"
         - "traefik.port=5050"
         - "traefik.tags=${TRAEFIK_PUBLIC_TAG}"
-        - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
+        - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
         # Traefik service that listens to HTTP
         - "traefik.redirectorservice.frontend.entryPoints=http"
         - "traefik.redirectorservice.frontend.redirect.entryPoint=https"
         # Traefik service that listens to HTTPS
         - "traefik.webservice.frontend.entryPoints=https"
     networks:
-      - ${TRAEFIK_PUBLIC_NETWORK}
+      - {{cookiecutter.traefik_public_network}}
       - default
   swagger-ui:
     deploy:
@@ -45,14 +45,14 @@ services:
         - "traefik.enable=true"
         - "traefik.port=80"
         - "traefik.tags=${TRAEFIK_PUBLIC_TAG}"
-        - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
+        - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
         # Traefik service that listens to HTTP
         - "traefik.redirectorservice.frontend.entryPoints=http"
         - "traefik.redirectorservice.frontend.redirect.entryPoint=https"
         # Traefik service that listens to HTTPS
         - "traefik.webservice.frontend.entryPoints=https"
     networks:
-      - ${TRAEFIK_PUBLIC_NETWORK}
+      - {{cookiecutter.traefik_public_network}}
       - default
   flower:
     deploy:
@@ -61,14 +61,14 @@ services:
         - "traefik.enable=true"
         - "traefik.port=5555"
         - "traefik.tags=${TRAEFIK_PUBLIC_TAG}"
-        - "traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}"
+        - "traefik.docker.network={{cookiecutter.traefik_public_network}}"
         # Traefik service that listens to HTTP
         - "traefik.redirectorservice.frontend.entryPoints=http"
         - "traefik.redirectorservice.frontend.redirect.entryPoint=https"
         # Traefik service that listens to HTTPS
         - "traefik.webservice.frontend.entryPoints=https"
     networks:
-      - ${TRAEFIK_PUBLIC_NETWORK}
+      - {{cookiecutter.traefik_public_network}}
       - default
   backend:
     deploy:
@@ -89,5 +89,5 @@ volumes:
   app-db-data: {}
 
 networks:
-  ${TRAEFIK_PUBLIC_NETWORK}:
+  {{cookiecutter.traefik_public_network}}:
     external: true
