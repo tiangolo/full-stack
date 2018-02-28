@@ -92,8 +92,8 @@ The input variables, with their default values (some auto generated) are:
 
 * `sentry_dsn`: Key URL (DSN) of Sentry, for live error reporting. If you are not using it yet, you should, is open source. E.g.: `https://1234abcd:5678ef@sentry.example.com/30`.
 
-* `docker_image_prefix`: Prefix to use for Docker image names. If you are using GitLab Docker registry it would be based on your code repository. E.g.: `git.example.com:5005/development-team/my-awesome-project/`.
-* `docker_image_backend`: Docker image name for the back end. By default, it will be based on your Docker image prefix, e.g.: `git.example.com:5005/development-team/my-awesome-project/backend`. And depending on your environment, a different tag will be appended ( `prod`, `stag`, `branch` ). So, the final image names used will be like: `git.example.com:5005/development-team/my-awesome-project/backend:prod`.
+* `docker_image_prefix`: Prefix to use for Docker image names. If you are using GitLab Docker registry it would be based on your code repository. E.g.: `git.example.com/development-team/my-awesome-project/`.
+* `docker_image_backend`: Docker image name for the back end. By default, it will be based on your Docker image prefix, e.g.: `git.example.com/development-team/my-awesome-project/backend`. And depending on your environment, a different tag will be appended ( `prod`, `stag`, `branch` ). So, the final image names used will be like: `git.example.com/development-team/my-awesome-project/backend:prod`.
 * `docker_image_celeryworker`: Docker image for the celery worker. By default, based on your Docker image prefix.
 * `docker_image_frontend`: Docker image for the front end. By default, based on your Docker image prefix.
 
@@ -102,6 +102,10 @@ The input variables, with their default values (some auto generated) are:
 This stack can be adjusted and used with several deployment options that are compatible with Docker Compose, but it is designed to be used in a cluster controlled with pure Docker in Swarm Mode with a Traefik main load balancer proxy.
 
 Read the [**Guide to deploy a Docker Swarm Mode Cluster**](docker-swarm-cluster-deploy.md) in this repository.
+
+## More details
+
+After using this generator, the new project will contain an extensive `README.md` with instructions for development, deployment, etc. You can read [the project `README.md` template here](./{{cookiecutter.project_slug}}/README.md).
 
 ## History
 
