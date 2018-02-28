@@ -17,4 +17,4 @@ services:
 # - docker-compose -f docker-compose.test.yml exec -T backend bash -c 'alembic revision --autogenerate -m "Testing" && alembic upgrade head'
 
 script:
-- test.sh
+- bash ./test.sh
