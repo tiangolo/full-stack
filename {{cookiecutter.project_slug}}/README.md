@@ -42,20 +42,25 @@ If you need to install any additional package to the worker, add it to the file 
 
 The `docker-compose.override.yml` file for local development has a host volume with your app files inside the container for rapid iteration. So you can update your code and it will be the same code (updated) inside the container. You just have to restart the server, but you don't need to rebuild the image to test a change. Make sure you use this only for local development. Your final production images should be built with the latest version of your code and do not depend on host volumes mounted.
 
+There is an `.env` file that has some Docker Compose default values that allow you to just run `docker-compose up -d` and start working, while still being able to use the same Docker Compose files for deployment, avoiding repetition of code and configuration as much as possible.
+
 
 ### Back end tests
 
 To test the back end run:
 
 ```bash
+# Generate the testing docker-stack.yml file with all the needed configurations
+DOMAIN=backend docker-compose -f docker-compose.yml -f docker-compose.build.yml -f docker-compose.test.yml config > docker-stack.yml
 # Build the testing stack
-docker-compose -f docker-compose.test.yml build
+docker-compose -f docker-stack.yml build
 # Start the testing stack
-docker-compose -f docker-compose.test.yml up -d
+docker-compose -f docker-stack.yml up -d
+sleep 20; # Give some time for the DB and prestart script to finish
 # Run the REST tests
-docker-compose -f docker-compose.test.yml exec -T backend-rest-tests pytest
+docker-compose -f docker-stack.yml exec -T backend-rest-tests pytest
 # Stop and eliminate the testing stack
-docker-compose -f docker-compose.test.yml down -v
+docker-compose -f docker-stack.yml down -v --remove-orphans
 ```
 
 The tests run with Pytest, modify and add tests to `./backend/app/app/rest_tests/`.
@@ -111,15 +116,118 @@ Check the file `package.json` to see other available options.
 
 ## Deployment
 
-To deploy the stack to a Docker Swarm run, e.g.:
+You can deploy the stack to a Docker Swarm mode cluster and use CI systems to do it automatically. But you have to configure a couple things first.
 
-```bash
-docker stack deploy -c docker-compose.prod.yml --with-registry-auth {{cookiecutter.docker_swarm_stack_name_main}}
+### Persisting Docker named volumes
+
+You need to make sure that each service (Docker container) that uses a volume is always deployed to the same Docker "node" in the cluster, that way it will preserve the data. Otherwise, it could be deployed to a different node each time, and each time the volume would be created in that new node before starting the service. As a result, it would look like your service was starting from scratch every time, losing all the previous data.
+
+That's specially important for a service running a database. But the same problem would apply if you were saving files in your main backend service (for example, if those files were uploaded by your users, or if they were created by your system).
+
+To solve that, you can put constraints in your services that make them run on a node with a specific label.
+
+So, you need to add one label to one of your nodes per each data volume you are using. Those Docker lables don't have to be on the same node, you can have each label in a different node, but you need to set one label for each data volume.
+
+And then, you put a constraint with that label in each node that uses that volume.
+
+The only service that needs a data volume in this stack is the database `db`. As it uses the named volume:
+
+```
+app-db-data
 ```
 
-Using the corresponding Docker Compose file.
+But if you added more volumes (for uploaded files, etc) you would have to add more labels for those volumes and update your `docker-compose.deploy.yml` with those new constraints.
 
-If you use GitLab CI, it will automatically deploy it. 
+To make sure that your labels are unique per volume per stack (for examlpe, that they are not the same for `prod` and `stag`) you should prefix them with the name of your stack and then use the same name of the volume.
+
+First, connect via SSH to your Docker Swarm mode cluster.
+
+Then check the available nodes with:
+
+```bash
+docker node ls
+```
+
+you would see an output like:
+
+```
+ID                            HOSTNAME               STATUS              AVAILABILITY        MANAGER STATUS
+nfa3d4df2df34as2fd34230rm *   dog.example.com        Ready               Active              Reachable
+2c2sd2342asdfasd42342304e     cat.example.com        Ready               Active              Leader
+c4sdf2342asdfasd4234234ii     snake.example.com      Ready               Active              Reachable
+```
+
+then chose a node from the list. For example, `dog.example.com`.
+
+Add the label to that node. Use as label the name of the stack you are deploying followed by a dot (`.`) followed by the named volume, and as value, just `true`, e.g.:
+
+```bash
+docker node update --label-add {{cookiecutter.docker_swarm_stack_name_main}}.app-db-data=true dog.example.com
+```
+
+Then you need to do the same for each stack version you have. For example, for staging you could do:
+
+```bash
+docker node update --label-add {{cookiecutter.docker_swarm_stack_name_staging}}.app-db-data=true cat.example.com
+```
+
+Then you need to have those constraints in your deployment Docker Compose file for the services that need to be fixed with each volume.
+
+To be able to use a single `docker-compose.deploy.yml` for deployments in different environments, like `prod` and `stag`, you can pass the name of the stack as an environment variable. Like:
+
+```bash
+STACK_NAME={{cookiecutter.docker_swarm_stack_name_main}} docker-compose -f docker-compose.deploy.yml config
+```
+
+To use and expand that environment variable inside the `docker-compose.deploy.yml` file you can add the constraints to the services like:
+
+```yaml
+version: '3'
+services:
+  db:
+    volumes:
+      - 'app-db-data:/var/lib/postgresql/data/pgdata'
+    deploy:
+      placement:
+        constraints: ['node.labels.${STACK_NAME}.app-db-data == true']
+```
+
+note the `${STACK_NAME}`. With the previous command, that would be converted to:
+
+```yaml
+version: '3'
+services:
+  db:
+    volumes:
+      - 'app-db-data:/var/lib/postgresql/data/pgdata'
+    deploy:
+      placement:
+        constraints: ['node.labels.{{cookiecutter.docker_swarm_stack_name_main}}.app-db-data == true']
+```
+
+If you add more volumes to your stack, you need to make sure add the corresponding labels to one of the nodes in your stack and the constraints to the services that use that named volume.
+
+This only has to be done before the first deployment. After that, the node labels will persist.
+
+### Deploy to a Docker Swarm mode cluster
+
+To deploy to production you need to first generate a `docker-stack.yml` file with:
+
+```bash
+DOMAIN={{cookiecutter.domain_main}} TRAEFIK_TAG={{cookiecutter.traefik_constraint_tag}} TRAEFIK_PUBLIC_TAG={{cookiecutter.traefik_public_constraint_tag}} STACK_NAME={{cookiecutter.docker_swarm_stack_name_main}} TAG=prod docker-compose -f docker-compose.yml -f docker-compose.admin.yml -f docker-compose.images.yml -f docker-compose.deploy.yml config > docker-stack.yml
+```
+
+By passing the environment variables and using different combined Docker Compose files you have less repetition of code and configurations. So, if you change your mind and, for example, want to deploy everything to a different domain, you only have to change the `DOMAIN` environment variable, instead of having to change many different points in different files. The same would happen if you wanted to add a different version / environment of your stack, like "`preproduction`", you would only have to set `TAG=preproduction` in your command.
+
+and then you can deploy that stack with:
+
+```bash
+docker stack deploy -c docker-stack.yml --with-registry-auth {{cookiecutter.docker_swarm_stack_name_main}}
+```
+
+### Continuous Integration / Continuous Delivery
+
+If you use GitLab CI, the included .gitlab-ci.yml can automatically deploy it. You may need to update it according to your GitLab configurations.
 
 GitLab CI is configured assuming 3 environments following GitLab flow:
 
@@ -127,6 +235,40 @@ GitLab CI is configured assuming 3 environments following GitLab flow:
 * `stag` (staging) from the `master` branch.
 * `branch`, from any other branch (a feature in development).
 
+
+## Docker Compose files
+
+There are several Docker Compose files, each with a specific purpose.
+
+They are designed to provide several "stages": development, building, testing, deployment to different environments like staging and production (and you can add more environments very easily).
+
+And they are designed to have the minimum repetition of code and configurations, so that if you need to change something, you have to change it in the minimum amount of places. That's why several of the files use environment variables that get auto-expanded. That way, if, for example, you want to use a different domain, you can call the `docker-compose` command with a different `DOMAIN` environment variable instead of having to change the domain in several places inside the Docker Compose files.
+
+Also, if you want to have another deployment environment, say `preprod`, you just have to change environment variables, but you can keep using the same Docker Compose files.
+
+Because of that, for each "stage" you would use a different set of Docker Compose files.
+
+But you probably don't have to worry about the different files, for building, testing and deployment, you would probably use a CI system (like GitLab CI) and the different configured files would be already set there.
+
+And for development, there's a `.env` file that will be automatically used by `docker-compose` locally, with the default configurations already set for local development. Including environment variables. So, for local development you can just run:
+
+```bash
+docker-compose up -d
+```
+
+and it will do the right thing.
+
+
+The purpose of each Docker Compose file is:
+
+* `docker-compose.yml`: main services base configurations; dependencies between base services; environment variables like default superuser, database password, etc.
+* `docker-compose.override.yml`: modifications and configurations strictly for development. Like mounting the code directory as a volume.
+* `docker-compose.admin.yml`: additional services for administration or utilities with their configurations, like PGAdmin and Swagger, that are not needed during testing and use external images (don't need to be built or create images).
+* `docker-compose.build.yml`: build directories and Dockerfiles.
+* `docker-compose.deploy.yml`: Docker Swarm mode cluster deployment configurations. Includes volumes, node constraints, Traefik labels for path based proxy forwarding, TLS (HTTPS) certificate generation with Traefik and Let's encrypt, Docker network configurations for Traefik internal proxy and public proxy, production specific environment variables, production specific Traefik internal proxy configurations.
+* `docker-compose.images.yml`: image names to be created, with environment variables for 
+the specific tag.
+* `docker-compose.test.yml`: testing specific additional container to be used only during testing.
 
 ## URLs
 
