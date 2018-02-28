@@ -27,7 +27,7 @@ COPY ./ /app/
 
 ARG env=prod
 
-RUN npm run test -- --single-run --code-coverage --browsers ChromeHeadlessNoSandbox
+RUN npm run test:prod
 
 RUN npm run build -- --prod --environment $env
 
