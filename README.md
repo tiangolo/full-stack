@@ -107,7 +107,7 @@ Read the [**Guide to deploy a Docker Swarm Mode Cluster**](docker-swarm-cluster-
 
 This project was based on [senseta-os/senseta-base-project](https://github.com/senseta-os/senseta-base-project).
 
-As [I'm the only maintainer](https://github.com/tiangolo) since it was there, I'll continue its development here (https://github.com/tiangolo/full-stack).
+As [I was the only maintainer](https://github.com/tiangolo), I'm continuing the development in this fork (https://github.com/tiangolo/full-stack).
 
 ## License
 
