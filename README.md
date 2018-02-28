@@ -1,10 +1,10 @@
 # Base Project
 
-[![Build Status](https://travis-ci.org/senseta-os/senseta-base-project.svg?branch=master)](https://travis-ci.org/senseta-os/senseta-base-project)
+[![Build Status](https://travis-ci.org/tiangolo/full-stack.svg?branch=master)](https://travis-ci.org/tiangolo/full-stack)
 
 Generate a back end and front end stack using Python, including interactive API documentation.
 
-[![Screenshot](screenshot.png)](https://github.com/senseta-os/senseta-base-project)
+[![Screenshot](screenshot.png)](https://github.com/tiangolo/full-stack)
 
 ## Features
 
@@ -42,7 +42,7 @@ Go to the directoy where you want to create your project and run:
 
 ```bash
 pip install cookiecutter
-cookiecutter https://github.com/senseta-os/base-project
+cookiecutter https://github.com/tiangolo/full-stack
 ```
 
 ### Generate passwords
@@ -102,6 +102,12 @@ The input variables, with their default values (some auto generated) are:
 This stack can be adjusted and used with several deployment options that are compatible with Docker Compose, but it is designed to be used in a cluster controlled with pure Docker in Swarm Mode with a Traefik main load balancer proxy.
 
 Read the [**Guide to deploy a Docker Swarm Mode Cluster**](docker-swarm-cluster-deploy.md) in this repository.
+
+## History
+
+This project was based on [senseta-os/senseta-base-project](https://github.com/senseta-os/senseta-base-project).
+
+As [I'm the only maintainer](https://github.com/tiangolo) since it was there, I'll continue its development here (https://github.com/tiangolo/full-stack).
 
 ## License
 
