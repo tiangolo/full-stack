@@ -1,5 +1,5 @@
 # Stage 0, based on Node.js, to build and compile Angular
-FROM node:9.2 as building
+FROM node:9.6 as building
 
 # Add Chrome dependencies, to run Puppeteer (headless Chrome) for Angular / Karma tests
 # Taken from: https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md
@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && apt-get update \
     && apt-get install -y google-chrome-unstable \
+      libgconf-2-4 \
       --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get purge --auto-remove -y curl \
