@@ -1,5 +1,5 @@
 # Stage 0, based on Node.js, to build and compile Angular
-FROM node:9.6 as building
+FROM node:9.7 as building
 
 # Add Chrome dependencies, to run Puppeteer (headless Chrome) for Angular / Karma tests
 # Taken from: https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md
