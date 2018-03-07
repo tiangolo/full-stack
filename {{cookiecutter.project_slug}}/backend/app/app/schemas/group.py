@@ -16,10 +16,10 @@ class GroupSchema(BaseSchema):
     users = fields.Nested(
         'UserSchema',
         only=[
-            'id', 'first_name', 'last_name', 'email', 'active', 'is_superuser'
+            'id', 'first_name', 'last_name', 'email', 'is_active', 'is_superuser'
         ], many=True)
     users_admin = fields.Nested(
         'UserSchema',
         only=[
-            'id', 'first_name', 'last_name', 'email', 'active', 'is_superuser'
+            'id', 'first_name', 'last_name', 'email', 'is_active', 'is_superuser'
         ], many=True)
