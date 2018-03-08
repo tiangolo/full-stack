@@ -89,7 +89,7 @@ services:
         - "traefik.tags=${TRAEFIK_TAG}"
 
 volumes:
-  app-db-data: {}
+  app-db-data:
 
 networks:
   {{cookiecutter.traefik_public_network}}:
