@@ -45,7 +45,6 @@ services:
         aliases: 
           - ${DOMAIN}
     # ports:
-      #- '80:80'
       #- '8888:8888'
     volumes:
       - './backend/app:/app'
