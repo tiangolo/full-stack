@@ -11,7 +11,6 @@ security_definitions = {
         'type': 'oauth2',
         'flow': 'password',
         'tokenUrl': f'{config.API_V1_STR}/login/access-token',
-        'refreshUrl': f'{config.API_V1_STR}/login/refresh-token',
     }
 }
 

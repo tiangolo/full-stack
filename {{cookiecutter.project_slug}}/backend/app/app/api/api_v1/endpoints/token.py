@@ -5,8 +5,7 @@ from datetime import timedelta
 from flask import abort
 from flask_apispec import doc, use_kwargs, marshal_with
 from flask_jwt_extended import (create_access_token, get_current_user,
-                                jwt_required, create_refresh_token,
-                                jwt_refresh_token_required)
+                                jwt_required)
 from webargs import fields
 
 # Import app code
@@ -41,45 +40,13 @@ def route_login_access_token(username, password):
         abort(400, 'Inactive user')
     access_token_expires = timedelta(
         minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
-    refresh_token_expires = timedelta(days=config.REFRESH_TOKEN_EXPIRE_DAYS)
     return {
         'access_token':
         create_access_token(
             identity=user.id, expires_delta=access_token_expires),
-        'refresh_token':
-        create_refresh_token(
-            identity=user.id, expires_delta=refresh_token_expires),
         'token_type':
         'bearer',
     }
-
-
-@docs.register
-@doc(description='Refresh access token', tags=['login'])
-@app.route(f'{config.API_V1_STR}/login/refresh-token', methods=['POST'])
-@use_kwargs(
-    {
-        'Authorization':
-        fields.Str(
-            required=True,
-            description=
-            'Authorization HTTP header with JWT refresh token, like: Authorization: Bearer asdf.qwer.zxcv'
-        )
-    },
-    locations=['headers'])
-@marshal_with(TokenSchema(only=['access_token']))
-@jwt_refresh_token_required
-def route_refresh_token(**kwargs):
-    user = get_current_user()
-    if not user:
-        abort(400, 'Could not authenticate user with provided token')
-    elif not user.is_active:
-        abort(400, 'Inactive user')
-    access_token_expires = timedelta(
-        minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        identity=user.id, expires_delta=access_token_expires)
-    return {'access_token': access_token}
 
 
 @docs.register

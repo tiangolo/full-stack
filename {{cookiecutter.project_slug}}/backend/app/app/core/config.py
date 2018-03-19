@@ -6,8 +6,7 @@ SECRET_KEY = os.getenvb(b'SECRET_KEY')
 if not SECRET_KEY:
     SECRET_KEY = os.urandom(32)
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
-REFRESH_TOKEN_EXPIRE_DAYS = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 8  # 60 minutes * 24 hours * 8 days
 
 SERVER_NAME = os.getenv('SERVER_NAME')
 SENTRY_DSN = os.getenv('SENTRY_DSN')
