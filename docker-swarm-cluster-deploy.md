@@ -198,6 +198,14 @@ docker service logs traefik
 
 ## Portainer
 
+* Create an environment variable with the name of the host to be used later (you might have created it already), e.g.:
+
+```bash
+export USE_HOSTNAME=dog.example.com
+# or
+export USE_HOSTNAME=$HOSTNAME
+```
+
 Create a Portainer web UI integrated with Traefik that allows you to use a web UI to see the state of your Docker services with:
 
 ```bash
@@ -208,7 +216,10 @@ docker service create \
     --label "traefik.port=9000" \
     --label "traefik.tags=traefik-public" \
     --label "traefik.docker.network=traefik-public" \
-    --label "traefik.frontend.entryPoints=http,https" \
+    --label "traefik.redirectorservice.frontend.entryPoints=http" \
+    --label "traefik.redirectorservice.frontend.redirect.entryPoint=https" \
+    --label "traefik.redirectorservice.frontend.redirect.entryPoint=https" \
+    --label "traefik.webservice.frontend.entryPoints=https" \
     --constraint 'node.role==manager' \
     --network traefik-public \
     --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \
