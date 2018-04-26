@@ -1,13 +1,13 @@
 version: '3'
 services:
   db:
-    image: 'postgres:10'
+    image: postgres:10
     environment:
       POSTGRES_DB: app
       POSTGRES_PASSWORD: {{cookiecutter.postgres_password}}
       PGDATA: /var/lib/postgresql/data/pgdata
   queue:
-    image: 'rabbitmq:3'
+    image: rabbitmq:3
   backend:
     depends_on: 
       - db

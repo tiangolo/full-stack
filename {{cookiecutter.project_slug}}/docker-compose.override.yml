@@ -5,10 +5,10 @@ services:
       - '5050:5050'
   swagger-ui:
     labels:
-      - "traefik.frontend.rule=PathPrefixStrip:/swagger/"
-      - "traefik.enable=true"
-      - "traefik.port=8080"
-      - "traefik.tags=${TRAEFIK_TAG}"
+      - traefik.frontend.rule=PathPrefixStrip:/swagger/
+      - traefik.enable=true
+      - traefik.port=8080
+      - traefik.tags=${TRAEFIK_TAG}
     environment:
       - API_URL=http://${DOMAIN}/api/v1/swagger/
   proxy:
@@ -20,9 +20,9 @@ services:
       --accessLog \
       --web
     labels:
-      - "traefik.frontend.rule=Host:${DOMAIN}"
-      - "traefik.enable=true"
-      - "traefik.port=80"
+      - traefik.frontend.rule=Host:${DOMAIN}
+      - traefik.enable=true
+      - traefik.port=80
 
     ports:
       - '80:80'
@@ -36,10 +36,10 @@ services:
       args: 
         env: dev
     labels:
-      - "traefik.frontend.rule=PathPrefix:/api"
-      - "traefik.enable=true"
-      - "traefik.port=80"
-      - "traefik.tags=${TRAEFIK_TAG}"
+      - traefik.frontend.rule=PathPrefix:/api
+      - traefik.enable=true
+      - traefik.port=80
+      - traefik.tags=${TRAEFIK_TAG}
     networks: 
       default: 
         aliases: 
@@ -67,15 +67,15 @@ services:
       args: 
         env: dev
     environment:
-      - 'RUN=celery worker -A app.worker -l info -Q main-queue -c 1'
-      - 'JUPYTER=jupyter notebook --ip=0.0.0.0 --allow-root'
+      - RUN=celery worker -A app.worker -l info -Q main-queue -c 1
+      - JUPYTER=jupyter notebook --ip=0.0.0.0 --allow-root
     volumes:
-      - './backend/app:/app'
+      - ./backend/app:/app
       # For Hydrogen Jupyter easy integration with
       # docker-compose exec server
       # and
       # jupyter notebook --ip=0.0.0.0 --allow-root
-      - '~/.jupyter:/root/.jupyter'
+      - ~/.jupyter:/root/.jupyter
   backend-rest-tests:
     build:
       context: ./backend
@@ -83,17 +83,17 @@ services:
       args: 
         env: dev
     environment:
-      - 'JUPYTER=jupyter notebook --ip=0.0.0.0 --allow-root'
+      - JUPYTER=jupyter notebook --ip=0.0.0.0 --allow-root
       - SERVER_NAME=${DOMAIN}
       # - SEED=0
     command: bash -c "while true; do sleep 1; done"
     volumes:
-      - './backend/app:/app'
+      - ./backend/app:/app
       # For Hydrogen Jupyter easy integration with
       # docker-compose exec server
       # and
       # jupyter notebook --ip=0.0.0.0 --allow-root
-      - '~/.jupyter:/root/.jupyter'
+      - ~/.jupyter:/root/.jupyter
     ports:
       - '8888:8888'
   frontend:
@@ -102,7 +102,7 @@ services:
       args: 
           env: dev
     labels:
-      - "traefik.frontend.rule=PathPrefix:/"
-      - "traefik.enable=true"
-      - "traefik.port=80"
-      - "traefik.tags=${TRAEFIK_TAG}"
+      - traefik.frontend.rule=PathPrefix:/
+      - traefik.enable=true
+      - traefik.port=80
+      - traefik.tags=${TRAEFIK_TAG}
