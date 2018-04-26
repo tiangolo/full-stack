@@ -2,9 +2,9 @@ import random
 
 import requests
 
-from app.rest_tests.utils.user import random_user
-from app.rest_tests.utils.user import user_authentication_headers
-from app.rest_tests.utils.faker import fake
+from app.tests.utils.user import random_user
+from app.tests.utils.user import user_authentication_headers
+from app.tests.utils.faker import fake
 
 from app.core import config
 

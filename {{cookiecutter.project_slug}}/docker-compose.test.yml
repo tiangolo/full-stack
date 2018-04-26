@@ -1,6 +1,6 @@
 version: '3'
 services:
-  backend-rest-tests:
+  backend-tests:
     build:
       context: ./backend
       dockerfile: Dockerfile-rest-tests

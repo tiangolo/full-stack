@@ -76,10 +76,10 @@ services:
       # and
       # jupyter notebook --ip=0.0.0.0 --allow-root
       - ~/.jupyter:/root/.jupyter
-  backend-rest-tests:
+  backend-tests:
     build:
       context: ./backend
-      dockerfile: Dockerfile-rest-tests
+      dockerfile: Dockerfile-tests
       args: 
         env: dev
     environment:

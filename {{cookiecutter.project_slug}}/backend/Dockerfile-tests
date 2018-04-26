@@ -14,4 +14,4 @@ COPY ./app /app
 
 ENV PYTHONPATH=/app
 
-WORKDIR /app/app/rest_tests
+WORKDIR /app/app/tests

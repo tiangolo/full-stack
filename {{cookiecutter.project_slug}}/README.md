@@ -58,14 +58,14 @@ docker-compose -f docker-stack.yml build
 docker-compose -f docker-stack.yml up -d
 sleep 20; # Give some time for the DB and prestart script to finish
 # Run the REST tests
-docker-compose -f docker-stack.yml exec -T backend-rest-tests pytest
+docker-compose -f docker-stack.yml exec -T backend-tests pytest
 # Stop and eliminate the testing stack
 docker-compose -f docker-stack.yml down -v --remove-orphans
 ```
 
-The tests run with Pytest, modify and add tests to `./backend/app/app/rest_tests/`.
+The tests run with Pytest, modify and add tests to `./backend/app/app/tests/`.
 
-If you need to install any additional package for the REST tests, add it to the file `./backend/app/Dockerfile-rest-tests`.
+If you need to install any additional package for the REST tests, add it to the file `./backend/app/Dockerfile-tests`.
 
 If you use GitLab CI the tests will run automatically.
 
@@ -229,11 +229,12 @@ docker stack deploy -c docker-stack.yml --with-registry-auth {{cookiecutter.dock
 
 If you use GitLab CI, the included .gitlab-ci.yml can automatically deploy it. You may need to update it according to your GitLab configurations.
 
-GitLab CI is configured assuming 3 environments following GitLab flow:
+GitLab CI is configured assuming 2 environments following GitLab flow:
 
 * `prod` (production) from the `production` branch.
 * `stag` (staging) from the `master` branch.
-* `branch`, from any other branch (a feature in development).
+
+If you need to add more environments, for example, you could imagine using a client-approved `preprod` branch, you can just copy the configurations int `.gitlab-ci.yml` for `stag` and rename the corresponding variables. All the Docker Compose files are configured to support as many environments as you need, so that you only need to modify `.gitlab-ci.yml` (or whichever CI system configuration you are using).
 
 
 ## Docker Compose files
@@ -301,20 +302,6 @@ Swagger UI: https://{{cookiecutter.domain_staging}}/swagger/
 PGAdmin: https://pgadmin.{{cookiecutter.domain_staging}}
 
 Flower: https://flower.{{cookiecutter.domain_staging}}
-
-### Branch (feature branches)
-
-Feature branch URLs, from any other branch.
-
-Front end: https://{{cookiecutter.domain_branch}}
-
-Back end: https://{{cookiecutter.domain_branch}}/api/
-
-Swagger UI: https://{{cookiecutter.domain_branch}}/swagger/
-
-PGAdmin: https://pgadmin.{{cookiecutter.domain_branch}}
-
-Flower: https://flower.{{cookiecutter.domain_branch}}
     
 ### Development
 
@@ -338,11 +325,9 @@ Traefik UI: http://{{cookiecutter.domain_dev}}:8080
 * `project_slug`: {{cookiecutter.project_slug}}
 * `domain_main`: {{cookiecutter.domain_main}}
 * `domain_staging`: {{cookiecutter.domain_staging}}
-* `domain_branch`: {{cookiecutter.domain_branch}}
 * `domain_dev`: {{cookiecutter.domain_dev}}
 * `docker_swarm_stack_name_main`: {{cookiecutter.docker_swarm_stack_name_main}}
 * `docker_swarm_stack_name_staging`: {{cookiecutter.docker_swarm_stack_name_staging}}
-* `docker_swarm_stack_name_branch`: {{cookiecutter.docker_swarm_stack_name_branch}}
 * `secret_key`: {{cookiecutter.secret_key}}
 * `first_superuser`: {{cookiecutter.first_superuser}}
 * `first_superuser_password`: {{cookiecutter.first_superuser_password}}
@@ -351,7 +336,6 @@ Traefik UI: http://{{cookiecutter.domain_dev}}:8080
 * `pgadmin_default_user_password`: {{cookiecutter.pgadmin_default_user_password}}
 * `traefik_constraint_tag`: {{cookiecutter.traefik_constraint_tag}}
 * `traefik_constraint_tag_staging`: {{cookiecutter.traefik_constraint_tag_staging}}
-* `traefik_constraint_tag_branch`: {{cookiecutter.traefik_constraint_tag_branch}}
 * `traefik_public_network`: {{cookiecutter.traefik_public_network}}
 * `traefik_public_constraint_tag`: {{cookiecutter.traefik_public_constraint_tag}}
 * `flower_auth`: {{cookiecutter.flower_auth}}

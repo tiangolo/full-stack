@@ -1,10 +1,10 @@
 import requests
 
-from app.rest_tests.utils.user import random_user
-from app.rest_tests.utils.user import user_authentication_headers
+from app.tests.utils.user import random_user
+from app.tests.utils.user import user_authentication_headers
 
-from app.rest_tests.utils.group import random_group
-from app.rest_tests.utils.group import random_group_admin
+from app.tests.utils.group import random_group
+from app.tests.utils.group import random_group_admin
 
 from app.core import config
 

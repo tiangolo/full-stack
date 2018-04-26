@@ -1,7 +1,7 @@
 import requests
 
-from app.rest_tests.utils.user import random_user, user_authentication_headers
-from app.rest_tests.utils.group import random_group
+from app.tests.utils.user import random_user, user_authentication_headers
+from app.tests.utils.group import random_group
 
 from app.core import config
 
