@@ -198,15 +198,19 @@ docker service logs traefik
 
 ## Portainer
 
+[Portainer](https://github.com/portainer/portainer) is a web UI that allows you to see the state of your Docker services in a Docker Swarm mode cluster.
+
+To start it integrated with Traefik (with routing and HTTPS handling) do the following.
+
 * Create an environment variable with the name of the host to be used later (you might have created it already), e.g.:
 
 ```bash
 export USE_HOSTNAME=dog.example.com
-# or
+# or if you have your $HOSTNAME variable configured:
 export USE_HOSTNAME=$HOSTNAME
 ```
 
-Create a Portainer web UI integrated with Traefik that allows you to use a web UI to see the state of your Docker services with:
+* Start the service with:
 
 ```bash
 docker service create \
@@ -226,6 +230,85 @@ docker service create \
     portainer/portainer \
     -H unix:///var/run/docker.sock
 ```
+
+You will be able to access the web UI at `https://portainer.<your domain>`.
+
+## cAdvisor
+
+[cAdvisor](https://github.com/google/cadvisor) analyzes resource usage and performance characteristics of running containers and allows you to see them in a web user interface.
+
+You can use it and take the advantage of the public Traefik configuration to handle routing, HTTPS and Basic Authentication.
+
+* Create an environment variable with a username (you will use it for the HTTP Basic Auth), for example:
+
+```bash
+export USERNAME=admin
+```
+
+* Create an environment variable with the password, e.g.:
+
+```bash
+export PASSWORD=changethis
+```
+
+* Use `openssl` to generate the "hashed" version of the password and store it in an environment variable:
+
+```bash
+export HASHED_PASSWORD=$(openssl passwd -apr1 $PASSWORD)
+```
+
+* Create an environment variable with the user name and password in "`htpasswd`" format:
+
+```bash
+export USERNAME_PASSWORD=$USERNAME:$HASHED_PASSWORD
+```
+
+* You can check the contents with:
+
+```bash
+echo $USERNAME_PASSWORD
+```
+
+It will look like:
+
+```
+admin:$apr1$89eqM5Ro$CxaFELthUKV21DpI3UTQO.
+```
+
+* Create an environment variable with the name of the host to be used later (you might have created it already), e.g.:
+
+```bash
+export USE_HOSTNAME=dog.example.com
+# or if you have your $HOSTNAME variable configured:
+export USE_HOSTNAME=$HOSTNAME
+```
+
+* Start the service with:
+
+```bash
+docker service create \
+    --name cadvisor \
+    --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
+    --mount type=bind,source=/,target=/rootfs,readonly=true \
+    --mount type=bind,source=/var/run,target=/var/run \
+    --mount type=bind,source=/sys,target=/sys,readonly=true \
+    --mount type=bind,source=/var/lib/docker/,target=/var/lib/docker,readonly=true \
+    --mount type=bind,source=/dev/disk/,target=/dev/disk,readonly=true \
+    --network traefik-public \
+    --label "traefik.frontend.rule=Host:cadvisor.$USE_HOSTNAME" \
+    --label "traefik.enable=true" \
+    --label "traefik.port=8080" \
+    --label "traefik.tags=traefik-public" \
+    --label "traefik.docker.network=traefik-public" \
+    --label "traefik.redirectorservice.frontend.entryPoints=http" \
+    --label "traefik.redirectorservice.frontend.redirect.entryPoint=https" \
+    --label "traefik.redirectorservice.frontend.redirect.entryPoint=https" \
+    --label "traefik.webservice.frontend.entryPoints=https" \
+    --label "traefik.frontend.auth.basic=$USERNAME_PASSWORD" \
+    google/cadvisor:latest
+```
+
+You will be able to access the web UI at `https://cadvisor.<your domain>`.
 
 
 ## GitLab Runner in Docker
