@@ -46,16 +46,27 @@ services:
         constraints:
           - node.role == manager
       labels:
+        # For the configured domain
         - traefik.frontend.rule=Host:${DOMAIN}
+        # For a domain with and without 'www'
+        # Comment the previous line above and un-comment the line below
+        # - "traefik.frontend.rule=Host:www.${DOMAIN},${DOMAIN}"
         - traefik.enable=true
         - traefik.port=80
         - traefik.tags=${TRAEFIK_PUBLIC_TAG}
         - traefik.docker.network={{cookiecutter.traefik_public_network}}
         # Traefik service that listens to HTTP
-        - traefik.redirectorservice.frontend.entryPoints=http
-        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+        - traefik.servicehttp.frontend.entryPoints=http
+        - traefik.servicehttp.frontend.redirect.entryPoint=https
         # Traefik service that listens to HTTPS
-        - traefik.webservice.frontend.entryPoints=https
+        - traefik.servicehttps.frontend.entryPoints=https
+        # Uncomment the config line below to detect and redirect www to non-www (or the contrary)
+        # The lines above for traefik.frontend.rule are needed too
+        # - "traefik.servicehttps.frontend.redirect.regex=^https?://(www.)?(${DOMAIN})/(.*)"
+        # To redirect from non-www to www un-comment the line below
+        # - "traefik.servicehttps.frontend.redirect.replacement=https://www.${DOMAIN}/$$3"
+        # To redirect from www to non-www un-comment the line below
+        # - "traefik.servicehttps.frontend.redirect.replacement=https://${DOMAIN}/$$3"
     networks:
       - {{cookiecutter.traefik_public_network}}
       - default
