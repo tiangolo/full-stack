@@ -13,6 +13,7 @@ tests:
   script:
     - >
       DOMAIN=backend
+      ENV=stag
       docker-compose
       -f docker-compose.yml
       -f docker-compose.build.yml
@@ -25,14 +26,35 @@ tests:
     - docker-compose -f docker-stack.yml exec -T backend-tests pytest
     - docker-compose -f docker-stack.yml down -v --remove-orphans
   tags:
-   - build
-   - test
+    - build
+    - test
+
+build-branch:
+  stage: build
+  script:
+    - >
+      TAG=stag
+      ENV=stag
+      docker-compose
+      -f docker-compose.images.yml
+      -f docker-compose.build.yml
+      config > docker-stack.yml
+    - docker-compose -f docker-stack.yml build
+    - docker-compose -f docker-stack.yml push
+  except:
+    - master
+    - production
+    - tags
+  tags:
+    - build
+    - test
 
 build-stag:
   stage: build
   script:
     - >
       TAG=stag
+      ENV=stag
       docker-compose
       -f docker-compose.images.yml
       -f docker-compose.build.yml
@@ -42,8 +64,8 @@ build-stag:
   only:
     - master
   tags:
-   - build
-   - test
+    - build
+    - test
     
 build-prod:
   stage: build
@@ -59,8 +81,8 @@ build-prod:
   only:
     - production
   tags:
-   - build
-   - test
+    - build
+    - test
 
 deploy-stag:
   stage: deploy

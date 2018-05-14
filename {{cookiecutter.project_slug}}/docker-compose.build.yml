@@ -10,3 +10,5 @@ services:
   frontend:
     build: 
       context: ./frontend
+      args:
+          env: ${ENV-prod}
