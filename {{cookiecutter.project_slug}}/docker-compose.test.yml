@@ -3,7 +3,7 @@ services:
   backend-tests:
     build:
       context: ./backend
-      dockerfile: Dockerfile-rest-tests
+      dockerfile: Dockerfile-tests
     command: bash -c "while true; do sleep 1; done"
     environment:
       - SERVER_NAME=${DOMAIN}
