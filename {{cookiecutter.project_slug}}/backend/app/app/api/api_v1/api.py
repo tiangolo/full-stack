@@ -10,3 +10,4 @@ from .api_docs import docs
 from .endpoints import group
 from .endpoints import token
 from .endpoints import user
+from .endpoints import utils

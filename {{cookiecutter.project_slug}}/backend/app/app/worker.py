@@ -16,5 +16,6 @@ client_sentry = Client(SENTRY_DSN)
 
 
 @celery_app.task(acks_late=True)
-def test_task():
-    return 'test task'
+def test_celery(word: str):
+    print('test task')
+    return f'test task return {word}'
