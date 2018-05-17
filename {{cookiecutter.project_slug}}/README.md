@@ -371,3 +371,31 @@ Traefik UI: http://{{cookiecutter.domain_dev}}:8080
 * `docker_image_backend`: {{cookiecutter.docker_image_backend}}
 * `docker_image_celeryworker`: {{cookiecutter.docker_image_celeryworker}}
 * `docker_image_frontend`: {{cookiecutter.docker_image_frontend}}
+
+
+## Updating, re-generating
+
+This project was generated using https://github.com/tiangolo/full-stack with:
+
+```bash
+pip install cookiecutter
+cookiecutter https://github.com/tiangolo/full-stack
+```
+
+You can generate the project again with the same configurations used the first time.
+
+That would be useful if, for example, the project generator (`tiangolo/full-stack`) was updated and you want to integrate or review the changes.
+
+You could generate a new project with the same configurations as this one in a parallel directory. And compare the differences between the two, without having to overwrite your current code and being able to use your current variables.
+
+To achieve that, the generated project includes a file `cookiecutter-config-file.yml` with the current variables used.
+
+You can use that file while generating a new project to reuse all those variables.
+
+For example, run:
+
+```bash
+cookiecutter --config-file ./cookiecutter-config-file.yml --output-dir ../project-copy https://github.com/tiangolo/full-stack
+```
+
+That will use the file `cookiecutter-config-file.yml` in the current directory (in this project) to generate a new project inside a sibling directory `project-copy`.
