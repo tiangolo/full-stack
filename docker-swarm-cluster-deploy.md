@@ -113,12 +113,31 @@ docker swarm join --token SWMTKN-1-5tl7ya98erd9qtasdfml4lqbosbhfqv3asdf4p13-dzw6
 
 ## Traefik
 
-Set up a main load balancer with Traefik that handles the public connections and Let's encrypt HTTPS certificates.
+Set up a main load balancer with Traefik that handles the public connections and Let's encrypt HTTPS certificates. 
 
+* Connect to a manager node in your cluster (you might have only one node) that will have the Traefik service via SSH.
 * Create a network that will be shared with Traefik and the containers that should be accessible from the outside, with:
 
 ```bash
 docker network create --driver=overlay traefik-public
+```
+
+* Create a volume in where Traefik will store HTTPS certificates:
+
+```bash
+docker volume create traefik-public-certificates
+```
+
+* Get the Swarm node ID of this node and store it in an environment variable:
+
+```bash
+export NODE_ID=$(docker info -f '{{.Swarm.NodeID}}')
+```
+
+* Create a tag in this node, so that Traefik is always deployed to the same node and uses the existing volume:
+
+```bash
+docker node update --label-add traefik-public.traefik-public-certificates=true $NODE_ID
 ```
 
 * Create an environment variable with your email, to be used for the generation of Let's Encrypt certificates:
@@ -127,19 +146,73 @@ docker network create --driver=overlay traefik-public
 export EMAIL=admin@example.com
 ```
 
+* Create an environment variable with the name of the host (you might have created it already), e.g.:
+
+```bash
+export USE_HOSTNAME=dog.example.com
+# or if you have your $HOSTNAME variable configured:
+export USE_HOSTNAME=$HOSTNAME
+```
+
+* You will access the Traefik dashboard at `traefik.<your hostname>`, e.g. `traefik.dog.example.com`. So, make sure that your DNS records point `traefik.<your hostname>` to one of the IPs of the cluster. Better if it is the IP where the Traefik service runs.
+
+* Create an environment variable with a username (you will use it for the HTTP Basic Auth), for example:
+
+```bash
+export USERNAME=admin
+```
+
+* Create an environment variable with the password, e.g.:
+
+```bash
+export PASSWORD=changethis
+```
+
+* Use `openssl` to generate the "hashed" version of the password and store it in an environment variable:
+
+```bash
+export HASHED_PASSWORD=$(openssl passwd -apr1 $PASSWORD)
+```
+
+* Create an environment variable with the user name and password in "`htpasswd`" format:
+
+```bash
+export USERNAME_PASSWORD=$USERNAME:$HASHED_PASSWORD
+```
+
+* You can check the contents with:
+
+```bash
+echo $USERNAME_PASSWORD
+```
+
+It will look like:
+
+```
+admin:$apr1$89eqM5Ro$CxaFELthUKV21DpI3UTQO.
+```
+
 * Create a Traefik service:
 
 ```bash
 docker service create \
     --name traefik \
-    --constraint=node.role==manager \
+    --constraint=node.labels.traefik-public.traefik-public-certificates==true \
     --publish 80:80 \
-    --publish 8080:8080 \
     --publish 443:443 \
     --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
     --mount type=volume,source=traefik-public-certificates,target=/certificates \
     --network traefik-public \
-    traefik:v1.5 \
+    --label "traefik.frontend.rule=Host:traefik.$USE_HOSTNAME" \
+    --label "traefik.enable=true" \
+    --label "traefik.port=8080" \
+    --label "traefik.tags=traefik-public" \
+    --label "traefik.docker.network=traefik-public" \
+    --label "traefik.redirectorservice.frontend.entryPoints=http" \
+    --label "traefik.redirectorservice.frontend.redirect.entryPoint=https" \
+    --label "traefik.webservice.frontend.entryPoints=https" \
+    --label "traefik.frontend.auth.basic=$USERNAME_PASSWORD" \
+    traefik:v1.6 \
     --docker \
     --docker.swarmmode \
     --docker.watch \
@@ -156,21 +229,31 @@ docker service create \
     --acme.acmelogging=true \
     --logLevel=DEBUG \
     --accessLog \
-    --web
+    --api
 ```
+
+You will be able to securely access the web UI at `https://traefik.<your domain>` using the created username and password.
 
 The previous command explained:
 
 * `docker service create`: create a Docker Swarm mode service
 * `--name traefik`: name the service "traefik"
-* `--constraint=node.role==manager` make it run on a Swarm Manager node
+* `--constraint=node.labels.traefik-public.traefik-public-certificates==true` make it run on a specific node, to be able to use the certificates stored in a volume in that node
 * `--publish 80:80`: listen on ports 80 - HTTP
-* `--publish 8080:8080`: listen on port 8080 - HTTP for Traefik web UI
 * `--publish 443:443`: listen on port 443 - HTTPS
 * `--mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock`: communicate with Docker, to read labels, etc.
 * `--mount type=volume,source=traefik-public-certificates,target=/certificates`: create a volume to store TLS certificates
 * `--network traefik-public`: listen to the specific network traefik-public
-* `traefik`: use the image traefik:latest
+* `--label "traefik.frontend.rule=Host:traefik.$USE_HOSTNAME"`: enable the Traefik API and dashboard in the host `traefik.$USE_HOSTNAME`, using the `$USE_HOSTNAME` environment variable created above
+* `--label "traefik.enable=true"`: make Traefik expose "itself" as a Docker service, this is what makes the Traefik dashboard available with HTTPS and basic auth
+* `--label "traefik.port=8080"`: when Traefik exposes itself as a service (for the dashboard), use the service port `8080`
+* `--label "traefik.tags=traefik-public"`: as the service will only expose services with the `traefik-public` tag (using a parameter below), make the dashboard service have this tag too, so that the Traefik public (itself) can find it and expose it
+* `--label "traefik.docker.network=traefik-public"`: make the dashboard service use the `traefik-public` network to expose itself
+* `--label "traefik.redirectorservice.frontend.entryPoints=http"`: make the web dashboard listen to HTTP, so that it can redirect to HTTPS
+* `--label "traefik.redirectorservice.frontend.redirect.entryPoint=https"`: make Traefik redirect HTTP trafic to HTTPS for the web dashboard
+* `--label "traefik.webservice.frontend.entryPoints=https"`: make the web dashboard listen and serve on HTTPS
+* `--label "traefik.frontend.auth.basic=$USERNAME_PASSWORD"`: enable basic auth, so that not every one can access your Traefik web dashboard, it uses the username and password created above
+* `traefik:v1.6`: use the image `traefik:v1.6`
 * `--docker`: enable Docker
 * `--docker.swarmmode`: enable Docker Swarm Mode
 * `--docker.watch`: enable "watch", so it reloads its config based on new stacks and labels
@@ -182,10 +265,13 @@ The previous command explained:
 * `--acme.email=$EMAIL`: let's encrypt email, using the environment variable
 * `--acme.storage=/certificates/acme.json`: where to store the Let's encrypt TLS certificates - in the mapped volume
 * `--acme.entryPoint=https`: the entrypoint for Let's encrypt - created above
+* `--acme.httpChallenge.entryPoint=http`: use HTTP for the ACME (Let's Encrypt HTTPS certificates) challenge, as HTTPS was disabled after a security issue
 * `--acme.onhostrule=true`: get new certificates automatically with host rules: "traefik.frontend.rule=Host:web.example.com"
 * `--acme.acmelogging=true`: log Let's encrypt activity - to debug when and if it gets certificates
 * `--logLevel=DEBUG`: log everything, to debug configurations and config reloads
-* `--web`: enable the web UI, at port 8080
+* `--accessLog`: enable the access log, to see and debug HTTP traffic
+* `--api`: enable the API, which includes the dashboard
+
 
 To check if it worked, check the logs:
 
@@ -202,13 +288,15 @@ docker service logs traefik
 
 To start it integrated with Traefik (with routing and HTTPS handling) do the following.
 
-* Create an environment variable with the name of the host to be used later (you might have created it already), e.g.:
+* Create an environment variable with the name of the host (you might have created it already), e.g.:
 
 ```bash
 export USE_HOSTNAME=dog.example.com
 # or if you have your $HOSTNAME variable configured:
 export USE_HOSTNAME=$HOSTNAME
 ```
+
+* You will access the service at `portainer.<your hostname>`, e.g. `portainer.dog.example.com`. So, make sure that your DNS records point `portainer.<your hostname>` to one of the IPs of the cluster. Better if it is the IP where the Traefik service runs.
 
 * Start the service with:
 
@@ -231,7 +319,7 @@ docker service create \
     -H unix:///var/run/docker.sock
 ```
 
-You will be able to access the web UI at `https://portainer.<your domain>`.
+You will be able to securely access the web UI at `https://portainer.<your domain>` using the created username and password.
 
 ## cAdvisor
 
@@ -275,13 +363,15 @@ It will look like:
 admin:$apr1$89eqM5Ro$CxaFELthUKV21DpI3UTQO.
 ```
 
-* Create an environment variable with the name of the host to be used later (you might have created it already), e.g.:
+* Create an environment variable with the name of the host (you might have created it already), e.g.:
 
 ```bash
 export USE_HOSTNAME=dog.example.com
 # or if you have your $HOSTNAME variable configured:
 export USE_HOSTNAME=$HOSTNAME
 ```
+
+* You will access the service at `cadvisor.<your hostname>`, e.g. `cadvisor.dog.example.com`. So, make sure that your DNS records point `cadvisor.<your hostname>` to one of the IPs of the cluster. Better if it is the IP where the Traefik service runs.
 
 * Start the service with:
 
@@ -308,7 +398,7 @@ docker service create \
     google/cadvisor:latest
 ```
 
-You will be able to access the web UI at `https://cadvisor.<your domain>`.
+You will be able to securely access the web UI at `https://cadvisor.<your domain>` using the created username and password.
 
 
 ## GitLab Runner in Docker
