@@ -298,11 +298,48 @@ export USE_HOSTNAME=$HOSTNAME
 
 * You will access the service at `portainer.<your hostname>`, e.g. `portainer.dog.example.com`. So, make sure that your DNS records point `portainer.<your hostname>` to one of the IPs of the cluster. Better if it is the IP where the Traefik service runs.
 
+* Create an overlay network for Portainer and its agents:
+
+```bash
+docker network create --driver overlay portainer_agent_network
+```
+
+* Deploy the Portainer agents:
+
+```bash
+docker service create \
+    --name portainer_agent \
+    --network portainer_agent_network \
+    -e AGENT_CLUSTER_ADDR=tasks.portainer_agent \
+    --mode global \
+    --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \
+    portainer/agent
+```
+
+* Create a volume in where Portainer will store its data:
+
+```bash
+docker volume create portainer-data
+```
+
+* Get the Swarm node ID of this node and store it in an environment variable:
+
+```bash
+export NODE_ID=$(docker info -f '{{.Swarm.NodeID}}')
+```
+
+* Create a tag in this node, so that Portainer is always deployed to the same node and uses the existing volume:
+
+```bash
+docker node update --label-add portainer.portainer-data=true $NODE_ID
+```
+
 * Start the service with:
 
 ```bash
 docker service create \
     --name portainer \
+    --constraint=node.labels.portainer.portainer-data==true \
     --label "traefik.frontend.rule=Host:portainer.$USE_HOSTNAME" \
     --label "traefik.enable=true" \
     --label "traefik.port=9000" \
@@ -314,12 +351,16 @@ docker service create \
     --label "traefik.webservice.frontend.entryPoints=https" \
     --constraint 'node.role==manager' \
     --network traefik-public \
+    --network portainer_agent_network \
+    --mount type=volume,source=portainer-data,target=/data \
     --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \
     portainer/portainer \
-    -H unix:///var/run/docker.sock
+    -H "tcp://tasks.portainer_agent:9001" --tlsskipverify
 ```
 
 You will be able to securely access the web UI at `https://portainer.<your domain>` using the created username and password.
+
+This quick guide on Portainer is adapted from the [official documentation for Docker Swarm mode clusters](http://portainer.readthedocs.io/en/stable/agent.html), adding deployment restrictions to make sure the same volume and database is always used and to enable HTTPS via Traefik.
 
 ## cAdvisor
 
