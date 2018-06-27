@@ -6,8 +6,9 @@ from . import config
 from .security import pwd_context
 
 engine = create_engine(
-    f'postgresql://postgres:{config.POSTGRES_PASSWORD}@db/app',
+    f'postgresql://{config.POSTGRES_USER}:{config.POSTGRES_PASSWORD}@{config.POSTGRES_SERVER}/{config.POSTGRES_DB}',
     convert_unicode=True)
+
 db_session = scoped_session(
     sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
