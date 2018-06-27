@@ -35,6 +35,5 @@
     "_copy_without_render": [
         "frontend/src/**/*.html",
         "frontend/node_modules/*"
-    ],
-    "api_users_open_registration": ["n", "y"]
+    ]
 }

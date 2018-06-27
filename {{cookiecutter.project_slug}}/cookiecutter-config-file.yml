@@ -22,7 +22,6 @@ default_context:
   docker_image_backend: '{{ cookiecutter.docker_image_backend }}'
   docker_image_celeryworker: '{{ cookiecutter.docker_image_celeryworker }}'
   docker_image_frontend: '{{ cookiecutter.docker_image_frontend }}'
-  api_users_open_registration: '{{ cookiecutter.api_users_open_registration }}'
   _copy_without_render:
     - frontend/src/**/*.html
     - frontend/node_modules/*

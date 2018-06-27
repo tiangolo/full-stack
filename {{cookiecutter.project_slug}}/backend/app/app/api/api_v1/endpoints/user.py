@@ -60,9 +60,7 @@ def route_users_get():
 @docs.register
 @doc(
     description='Create new user',
-{%- if cookiecutter.api_users_open_registration == 'n' -%}
     security=security_params,
-{% endif %}
     tags=['users'])
 @app.route(f'{config.API_V1_STR}/users/', methods=['POST'])
 @use_kwargs({
@@ -73,9 +71,7 @@ def route_users_get():
     'group_id': fields.Int(required=True),
 })
 @marshal_with(UserSchema())
-{%- if cookiecutter.api_users_open_registration == 'n' -%}
-{{ '@jwt_required' }}
-{% endif %}
+@jwt_required
 def route_users_post(email=None,
                      password=None,
                      first_name=None,
@@ -83,14 +79,13 @@ def route_users_post(email=None,
                      group_id=None):
     current_user = get_current_user()
 
-{%- if cookiecutter.api_users_open_registration == 'n' -%}
     if not current_user:
         abort(400, 'Could not authenticate user with provided token')
     elif not current_user.is_active:
         abort(400, 'Inactive user')
     elif not current_user.is_superuser:
         abort(400, 'Only a superuser can execute this action')
-{% endif %}
+
     user = db_session.query(User).filter(User.email == email).first()
 
     if user:
