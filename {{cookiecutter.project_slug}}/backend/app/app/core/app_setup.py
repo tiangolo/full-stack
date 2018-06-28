@@ -4,13 +4,14 @@
 from raven.contrib.flask import Sentry
 # Import app code
 from app.main import app
-from .database import db_session, init_db
-from . import config
+from app.db.flask_session import db_session
+from app.db.init_db import init_db
+from app.core import config
 # Set up CORS
 from . import cors  # noqa
 
 from .jwt import jwt  # noqa
-from . import errors
+from . import errors  # noqa
 
 from ..api.api_v1 import api as api_v1  # noqa
 
@@ -27,4 +28,4 @@ def shutdown_db_session(exception=None):
 
 @app.before_first_request
 def setup():
-    init_db()
+    init_db(db_session)

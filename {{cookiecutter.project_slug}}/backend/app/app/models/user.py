@@ -6,8 +6,8 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, DateTime, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 # Import app code
-from ..core.database import Base
-from .base_relations import groups_admin_users
+from app.db.base_class import Base
+from app.models.base_relations import groups_admin_users
 
 # Typings, for autocompletion (VS Code with Python plug-in)
 from . import group as group_model  # noqa

@@ -6,8 +6,8 @@ from datetime import datetime
 from sqlalchemy import (Column, Integer, DateTime, String)
 from sqlalchemy.orm import relationship
 # Import app code
-from ..core.database import Base
-from .base_relations import groups_admin_users
+from app.db.base_class import Base
+from app.models.base_relations import groups_admin_users
 
 
 class Group(Base):

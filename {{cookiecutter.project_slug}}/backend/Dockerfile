@@ -1,7 +1,7 @@
 FROM tiangolo/uwsgi-nginx-flask:python3.6
 
 RUN pip install --upgrade pip
-RUN pip install flask flask-cors psycopg2-binary raven[flask] celery==4.1.0 passlib[bcrypt] SQLAlchemy==1.1.13 flask-apispec flask-jwt-extended alembic
+RUN pip install flask flask-cors psycopg2-binary raven[flask] celery==4.1.0 passlib[bcrypt] flask-sqlalchemy SQLAlchemy==1.1.13 flask-apispec flask-jwt-extended alembic
 
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:

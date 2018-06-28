@@ -13,7 +13,7 @@ from flask_jwt_extended import (get_current_user, jwt_required)
 from app.main import app
 from app.api.api_v1.api_docs import docs, security_params
 from app.core import config
-from app.core.database import db_session
+from app.db.flask_session import db_session
 from app.core.celery_app import celery_app
 # Import Schemas
 from app.schemas.group import GroupSchema

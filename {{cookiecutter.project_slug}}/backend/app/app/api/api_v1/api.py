@@ -3,7 +3,7 @@
 # Import app code
 from app.main import app
 from app.core import config
-from app.core.database import db_session
+from app.db.flask_session import db_session
 
 from .api_docs import docs
 

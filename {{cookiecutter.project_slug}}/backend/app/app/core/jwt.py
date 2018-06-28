@@ -5,8 +5,8 @@ from flask_jwt_extended import JWTManager
 
 # Import app code
 from ..main import app
-from .database import db_session
-from ..models.user import User
+from app.db.flask_session import db_session
+from app.models.user import User
 
 # Setup the Flask-JWT-Extended extension
 jwt = JWTManager(app)
