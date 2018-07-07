@@ -2,7 +2,7 @@ import logging
 
 from tenacity import retry, stop_after_attempt, wait_fixed, before_log, after_log
 
-from app.db.external_session import get_session
+from app.db.external_session import db_session
 from app.tests.api.api_v1.token.test_token import test_get_access_token
 
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +20,7 @@ wait_seconds = 1
 )
 def init():
     # Try to create session to check if DB is awake
-    db_session = get_session()  # noqa
+    db_session.execute('SELECT 1')
     # Wait for API to be awake, run one simple tests to authenticate
     test_get_access_token()
 

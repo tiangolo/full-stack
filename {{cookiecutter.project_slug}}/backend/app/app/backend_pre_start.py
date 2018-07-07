@@ -2,7 +2,7 @@ import logging
 
 from tenacity import retry, stop_after_attempt, wait_fixed, before_log, after_log
 
-from app.db.external_session import get_session
+from app.db.external_session import db_session
 from app.db.init_db import init_db
 
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +20,6 @@ wait_seconds = 1
 )
 def init():
     # Try to create session to check if DB is awake
-    db_session = get_session()
     db_session.execute('SELECT 1')
 
 
