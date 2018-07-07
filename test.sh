@@ -12,7 +12,7 @@ docker-compose -f docker-stack.yml down -v --remove-orphans # Remove possibly pr
 docker-compose -f docker-stack.yml up -d
 sleep 20; # Give some time for the DB and prestart script to finish
 docker-compose -f docker-stack.yml exec -T backend bash -c 'alembic revision --autogenerate -m "Testing" && alembic upgrade head'
-docker-compose -f docker-stack.yml exec -T backend-tests pytest
+docker-compose -f docker-stack.yml exec -T backend-tests /start.sh
 docker-compose -f docker-stack.yml down -v --remove-orphans
 
 cd ../
