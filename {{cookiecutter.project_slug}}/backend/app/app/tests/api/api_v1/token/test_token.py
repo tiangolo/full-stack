@@ -4,8 +4,12 @@ import requests
 # Import app code
 from app.core import config
 
+# Import testing code
+from app.tests.utils.utils import get_server_api
 
-def test_get_access_token(server_api):
+
+def test_get_access_token():
+    server_api = get_server_api()
     login_data = {
         "username": config.FIRST_SUPERUSER,
         "password": config.FIRST_SUPERUSER_PASSWORD,
@@ -19,7 +23,8 @@ def test_get_access_token(server_api):
     assert tokens["access_token"]
 
 
-def test_use_access_token(server_api, superuser_token_headers):
+def test_use_access_token(superuser_token_headers):
+    server_api = get_server_api()
     r = requests.post(
         f"{server_api}{config.API_V1_STR}/login/test-token",
         headers=superuser_token_headers,

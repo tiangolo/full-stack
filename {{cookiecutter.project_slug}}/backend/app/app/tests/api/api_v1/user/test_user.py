@@ -1,6 +1,7 @@
 import random
 import requests
 
+from app.tests.utils.utils import get_server_api
 from app.tests.utils.user import random_user, user_authentication_headers
 from app.tests.utils.group import (
     get_group_users_and_admins,
@@ -10,7 +11,8 @@ from app.tests.utils.group import (
 from app.core import config
 
 
-def test_get_users_superuser_me(server_api, superuser_token_headers):
+def test_get_users_superuser_me(superuser_token_headers):
+    server_api = get_server_api()
     r = requests.get(
         f"{server_api}{config.API_V1_STR}/users/me", headers=superuser_token_headers
     )
@@ -21,7 +23,8 @@ def test_get_users_superuser_me(server_api, superuser_token_headers):
     assert current_user["is_superuser"] == True
 
 
-def test_create_user_existing_email(server_api, superuser_token_headers):
+def test_create_user_existing_email(superuser_token_headers):
+    server_api = get_server_api()
     post_data = random_user()
     r = requests.post(
         f"{server_api}{config.API_V1_STR}/users/",
@@ -47,7 +50,8 @@ def test_create_user_existing_email(server_api, superuser_token_headers):
     assert "id" not in created_user
 
 
-def test_create_user_new_email(server_api, superuser_token_headers):
+def test_create_user_new_email(superuser_token_headers):
+    server_api = get_server_api()
 
     post_data = random_user()
     r = requests.post(
@@ -76,7 +80,8 @@ def test_create_user_new_email(server_api, superuser_token_headers):
         assert "id" not in created_user
 
 
-def test_user_group_permissions(server_api, superuser_token_headers):
+def test_user_group_permissions(superuser_token_headers):
+    server_api = get_server_api()
 
     new_user = random_user()
     r = requests.post(
@@ -121,7 +126,8 @@ def test_user_group_permissions(server_api, superuser_token_headers):
                 assert r.status_code == 400
 
 
-def test_create_user_by_superuser(server_api, superuser_token_headers):
+def test_create_user_by_superuser(superuser_token_headers):
+    server_api = get_server_api()
 
     new_user = random_user()
     r = requests.post(
@@ -150,7 +156,8 @@ def test_create_user_by_superuser(server_api, superuser_token_headers):
     assert r.status_code == 200
 
 
-def test_create_user_by_superuser_any_group(server_api, superuser_token_headers):
+def test_create_user_by_superuser_any_group(superuser_token_headers):
+    server_api = get_server_api()
     new_group = random_group()
     r = requests.post(
         f"{server_api}{config.API_V1_STR}/groups/",
@@ -189,7 +196,8 @@ def test_create_user_by_superuser_any_group(server_api, superuser_token_headers)
     assert r.status_code == 200
 
 
-def test_create_user_by_group_admin(server_api, superuser_token_headers):
+def test_create_user_by_group_admin(superuser_token_headers):
+    server_api = get_server_api()
 
     _, group_admin_auth = random_group_admin(server_api, superuser_token_headers)
 
@@ -203,7 +211,8 @@ def test_create_user_by_group_admin(server_api, superuser_token_headers):
     assert r.status_code == 400
 
 
-def test_create_user_by_normal_user(server_api, superuser_token_headers):
+def test_create_user_by_normal_user(superuser_token_headers):
+    server_api = get_server_api()
 
     new_user = random_user()
     r = requests.post(

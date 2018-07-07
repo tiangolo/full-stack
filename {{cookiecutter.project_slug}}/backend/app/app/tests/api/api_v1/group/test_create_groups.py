@@ -1,13 +1,14 @@
 import requests
 
+from app.tests.utils.utils import get_server_api
 from app.tests.utils.user import random_user, user_authentication_headers
 from app.tests.utils.group import random_group
 
 from app.core import config
 
 
-def test_create_group_by_superuser(server_api, superuser_token_headers):
-
+def test_create_group_by_superuser(superuser_token_headers):
+    server_api = get_server_api()
     new_group = random_group()
 
     r = requests.post(
@@ -29,7 +30,8 @@ def test_create_group_by_superuser(server_api, superuser_token_headers):
     assert created_group["name"] == new_group["name"]
 
 
-def test_create_group_by_normal_user(server_api, superuser_token_headers):
+def test_create_group_by_normal_user(superuser_token_headers):
+    server_api = get_server_api()
     new_user = random_user()
     r = requests.post(
         f"{server_api}{config.API_V1_STR}/users/",
