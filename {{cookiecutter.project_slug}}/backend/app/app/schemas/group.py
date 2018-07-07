@@ -4,6 +4,7 @@
 
 # Import installed packages
 from marshmallow import fields
+
 # Import app code
 from .base import BaseSchema
 
@@ -14,12 +15,12 @@ class GroupSchema(BaseSchema):
     created_at = fields.DateTime()
     name = fields.Str()
     users = fields.Nested(
-        'UserSchema',
-        only=[
-            'id', 'first_name', 'last_name', 'email', 'is_active', 'is_superuser'
-        ], many=True)
+        "UserSchema",
+        only=["id", "first_name", "last_name", "email", "is_active", "is_superuser"],
+        many=True,
+    )
     users_admin = fields.Nested(
-        'UserSchema',
-        only=[
-            'id', 'first_name', 'last_name', 'email', 'is_active', 'is_superuser'
-        ], many=True)
+        "UserSchema",
+        only=["id", "first_name", "last_name", "email", "is_active", "is_superuser"],
+        many=True,
+    )

@@ -11,19 +11,19 @@ def init_db(db_session):
     # the tables uncommenting the next line
     # Base.metadata.create_all(bind=engine)
 
-    group = db_session.query(Group).filter(Group.name == 'default').first()
+    group = db_session.query(Group).filter(Group.name == "default").first()
     if not group:
-        group = Group(name='default')
+        group = Group(name="default")
         db_session.add(group)
 
-    user = db_session.query(User).filter(
-        User.email == config.FIRST_SUPERUSER).first()
+    user = db_session.query(User).filter(User.email == config.FIRST_SUPERUSER).first()
     if not user:
         user = User(
             email=config.FIRST_SUPERUSER,
             password=pwd_context.hash(config.FIRST_SUPERUSER_PASSWORD),
             group=group,
-            is_superuser=True)
+            is_superuser=True,
+        )
         user.groups_admin.append(group)
 
         db_session.add(user)

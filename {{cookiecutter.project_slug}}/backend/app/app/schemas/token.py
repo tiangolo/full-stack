@@ -4,6 +4,7 @@
 
 # Import installed packages
 from marshmallow import fields
+
 # Import app code
 from .base import BaseSchema
 

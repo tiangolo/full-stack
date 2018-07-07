@@ -7,7 +7,7 @@
 from flask import abort
 from webargs import fields
 from flask_apispec import doc, use_kwargs, marshal_with
-from flask_jwt_extended import (get_current_user, jwt_required)
+from flask_jwt_extended import get_current_user, jwt_required
 
 # Import app code
 from app.main import app
@@ -19,6 +19,7 @@ from app.core.celery_app import celery_app
 
 # Import Schemas
 from app.schemas.user import UserSchema
+
 # Import models
 from app.models.user import User
 from app.models.group import Group
@@ -26,19 +27,20 @@ from app.models.group import Group
 
 @docs.register
 @doc(
-    description='Retrieve the users that the given user manages from groups',
+    description="Retrieve the users that the given user manages from groups",
     security=security_params,
-    tags=['users'])
-@app.route(f'{config.API_V1_STR}/users/', methods=['GET'])
+    tags=["users"],
+)
+@app.route(f"{config.API_V1_STR}/users/", methods=["GET"])
 @marshal_with(UserSchema(many=True))
 @jwt_required
 def route_users_get():
     current_user = get_current_user()
 
     if not current_user:
-        abort(400, 'Could not authenticate user with provided token')
+        abort(400, "Could not authenticate user with provided token")
     elif not current_user.is_active:
-        abort(400, 'Inactive user')
+        abort(400, "Inactive user")
 
     users = [current_user]
 
@@ -58,40 +60,37 @@ def route_users_get():
 
 
 @docs.register
-@doc(
-    description='Create new user',
-    security=security_params,
-    tags=['users'])
-@app.route(f'{config.API_V1_STR}/users/', methods=['POST'])
-@use_kwargs({
-    'email': fields.Str(required=True),
-    'password': fields.Str(required=True),
-    'first_name': fields.Str(),
-    'last_name': fields.Str(),
-    'group_id': fields.Int(required=True),
-})
+@doc(description="Create new user", security=security_params, tags=["users"])
+@app.route(f"{config.API_V1_STR}/users/", methods=["POST"])
+@use_kwargs(
+    {
+        "email": fields.Str(required=True),
+        "password": fields.Str(required=True),
+        "first_name": fields.Str(),
+        "last_name": fields.Str(),
+        "group_id": fields.Int(required=True),
+    }
+)
 @marshal_with(UserSchema())
 @jwt_required
-def route_users_post(email=None,
-                     password=None,
-                     first_name=None,
-                     last_name=None,
-                     group_id=None):
+def route_users_post(
+    email=None, password=None, first_name=None, last_name=None, group_id=None
+):
     current_user = get_current_user()
 
     if not current_user:
-        abort(400, 'Could not authenticate user with provided token')
+        abort(400, "Could not authenticate user with provided token")
     elif not current_user.is_active:
-        abort(400, 'Inactive user')
+        abort(400, "Inactive user")
     elif not current_user.is_superuser:
-        abort(400, 'Only a superuser can execute this action')
+        abort(400, "Only a superuser can execute this action")
 
     user = db_session.query(User).filter(User.email == email).first()
 
     if user:
         return abort(
-            400,
-            f'The user with this email already exists in the system: {email}')
+            400, f"The user with this email already exists in the system: {email}"
+        )
 
     group = db_session.query(Group).filter(Group.id == group_id).first()
 
@@ -102,7 +101,8 @@ def route_users_post(email=None,
         password=pwd_context.hash(password),
         first_name=first_name,
         last_name=last_name,
-        group=group)
+        group=group,
+    )
 
     db_session.add(user)
     db_session.commit()
@@ -111,43 +111,36 @@ def route_users_post(email=None,
 
 
 @docs.register
-@doc(
-    description='Get current user',
-    security=security_params,
-    tags=['users'])
-@app.route(f'{config.API_V1_STR}/users/me', methods=['GET'])
+@doc(description="Get current user", security=security_params, tags=["users"])
+@app.route(f"{config.API_V1_STR}/users/me", methods=["GET"])
 @marshal_with(UserSchema())
 @jwt_required
 def route_users_me_get():
     current_user = get_current_user()
     if not current_user:
-        abort(400, 'Could not authenticate user with provided token')
+        abort(400, "Could not authenticate user with provided token")
     elif not current_user.is_active:
-        abort(400, 'Inactive user')
+        abort(400, "Inactive user")
     return current_user
 
 
 @docs.register
-@doc(
-    description='Get a specific user by ID',
-    security=security_params,
-    tags=['users'])
-@app.route(f'{config.API_V1_STR}/users/<int:user_id>', methods=['GET'])
+@doc(description="Get a specific user by ID", security=security_params, tags=["users"])
+@app.route(f"{config.API_V1_STR}/users/<int:user_id>", methods=["GET"])
 @marshal_with(UserSchema())
 @jwt_required
 def route_users_id_get(user_id):
     current_user = get_current_user()  # type: User
 
     if not current_user:
-        abort(400, 'Could not authenticate user with provided token')
+        abort(400, "Could not authenticate user with provided token")
     elif not current_user.is_active:
-        abort(400, 'Inactive user')
+        abort(400, "Inactive user")
 
-    user = db_session.query(User).filter(
-        User.id == user_id).first()  # type: User
+    user = db_session.query(User).filter(User.id == user_id).first()  # type: User
 
     if not user:
-        return abort(400, f'The user with id: {user_id} does not exists')
+        return abort(400, f"The user with id: {user_id} does not exists")
 
     if current_user.is_superuser:
         # Return everything, don't abort
@@ -157,6 +150,6 @@ def route_users_id_get(user_id):
         pass
 
     else:
-        abort(400, 'Not authorized')
+        abort(400, "Not authorized")
 
     return user
