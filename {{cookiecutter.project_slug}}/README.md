@@ -1,16 +1,18 @@
 # {{cookiecutter.project_name}}
 
-## Back end local development
+## Backend local development, first steps
 
-* Update your local `hosts` file, set the IP `127.0.0.1` (your `localhost`) to `{{cookiecutter.domain_dev}}`. The `docker-compose.override.yml` file will set the environment variable `SERVER_NAME` to that host. Otherwise you would receive 404 errors.
+* Update your local `hosts` file, set the IP `127.0.0.1` (your `localhost`) to `{{cookiecutter.domain_dev}}`. The `docker-compose.override.yml` file will set the environment variable `SERVER_NAME` to that host. Otherwise you would receive 404 HTTP errors and "Cross Origin Resource Sharing" (CORS) errors.
 
-* Modify your hosts file, probably in `/etc/hosts` to include:
+* Modify your hosts file, for macOS and Linux, probably in `/etc/hosts`. For Windows, in `c:\Windows\System32\Drivers\etc\hosts` to include:
 
 ```
 0.0.0.0    {{cookiecutter.domain_dev}}
 ```
 
-...that will make your browser talk to your locally running server.
+...that will make your browser talk to your locally running server when it is asked to go to `{{cookiecutter.domain_dev}}` and think that it is a remote server while it is actually running locally.
+
+Make sure you open the `hosts` file with administrator privileges to be able to change it. And save it as is, without extensions (Windows tends to try to automatically add `.txt` extensions).
 
 * Start the stack with Docker Compose:
 
@@ -18,21 +20,24 @@
 docker-compose up -d
 ```
 
-* Start an interactive session in the server container that is running an infinite loop doing nothing:
+* Now you can open your browser and interact with these URLs:
 
-```bash
-docker-compose exec backend bash
-```
+Frontend, built with Docker, with routes handled based on the path: http://{{cookiecutter.domain_dev}}
 
-**Note**: Before the first run, make sure you create at least one "revision" of your models and database and make sure you create those models / tables in the database with `alembic`. See the section about migrations below for specific instructions.
+Backend, JSON based web API, with Swagger automatic documentation: http://{{cookiecutter.domain_dev}}/api/
 
-* Run the local debugging Flask server, all the command is in the `RUN` environment variable:
+Swagger UI, frontend user interface to interact with the API live: http://{{cookiecutter.domain_dev}}/swagger/
 
-```bash
-$RUN
-```
+PGAdmin, PostgreSQL web administration: http://{{cookiecutter.domain_dev}}:5050
 
-* Your OS will handle redirecting `{{cookiecutter.domain_dev}}` to your local stack. So, in your browser, go to: http://{{cookiecutter.domain_dev}}.
+Flower, administration of Celery tasks: http://{{cookiecutter.domain_dev}}:5555
+
+Traefik UI, to see how the routes are being handled by the proxy: http://{{cookiecutter.domain_dev}}:8080
+
+
+## Backend local development, additional details
+
+### General workflow
 
 Add and modify SQLAlchemy models to `./backend/app/app/models/`, Marshmallow schemas to `./backend/app/app/schemas` and API endpoints to `./backend/app/app/api/`.
 
@@ -40,14 +45,105 @@ Add and modify tasks to the Celery worker in `./backend/app/app/worker.py`.
 
 If you need to install any additional package to the worker, add it to the file `./backend/app/Dockerfile-celery-worker`.
 
-The `docker-compose.override.yml` file for local development has a host volume with your app files inside the container for rapid iteration. So you can update your code and it will be the same code (updated) inside the container. You just have to restart the server, but you don't need to rebuild the image to test a change. Make sure you use this only for local development. Your final production images should be built with the latest version of your code and do not depend on host volumes mounted.
-
 There is an `.env` file that has some Docker Compose default values that allow you to just run `docker-compose up -d` and start working, while still being able to use the same Docker Compose files for deployment, avoiding repetition of code and configuration as much as possible.
 
+### Docker Compose Override
 
-### Back end tests
+During development, you can change Docker Compose settings that will only affect the local development environment, in the file `docker-compose.override.yml`.
 
-To test the back end run:
+The changes to those files only affect the local development environment, not the production environment. So, you can add "temporal" changes that help the development workflow.
+
+For example, the directory with the backend code is mounted as a Docker "host volume", mapping the code you change live to the directory inside the container. That allows you to test your changes right away, without having to build the Docker image again. It should only be done during development, for production, you should build the Docker image with a recent version of the backend code. But during development, it allows you to iterate very fast.
+
+There is also a commented out `command` override, if you want to enable it, uncomment it. It makes the backend container run a process that does "nothing", but keeps the process running. That allows you to get inside your living container and run commands inside, for example a Python interpreter to test installed dependencies, or start the Flask development server that reloads when it detectes changes.
+
+To get inside the container with a `bash` session you can start the stack with:
+
+```bash
+docker-compose up -d
+```
+
+and then `exec` inside the running container:
+
+```bash
+docker-compose exec backend bash
+```
+
+You should see an output like:
+
+```
+root@7f2607af31c3:/app#
+```
+
+that means that you are in a `bash` session inside your container, as a `root` user, under the `/app` directory.
+
+The file `docker-compose.override.yml` also has the declaration of an environment variable `$RUN` to run the Flask development server, with all the configurations to make it work in Docker. You can "run" that environment variable and it will start that Flask development server with:
+
+```bash
+$RUN
+```
+
+...it will look like:
+
+```bash
+root@7f2607af31c3:/app# $RUN
+```
+
+and then hit enter. That runs the Flask development server that auto reloads when it detects code changes.
+
+Nevertheless, if it doesn't detect a change but a syntax error, it will just stop with an error. But as the container is still alive and you are in a Bash session, you can quickly restart it after fixing the error, running the same command ("up arrow" and "Enter").
+
+...this previous detail is what makes it useful to have the container alive doing nothing and then, in a Bash session, make it run the Flask development server.
+
+The Celery worker has a `$RUN` variable too, running the Celery worker, so that you can test it while being inside the container and debug errors, etc.
+
+### Live development with Python Jupyter Notebooks
+
+If you know about Python [Jupyter Notebooks](http://jupyter.org/), you can take advantage of them during local development.
+
+The `docker-compose.override.yml` file sends a variable `env` with a value `dev ` the the build process of the Docker image (during local development) and the `Dockerfile` has steps to then install and configure Jupyter inside your Docker container.
+
+So, you can enter into the Docker running container:
+
+```bash
+docker-compose exec backend bash
+```
+
+And use the environment variable `$JUPYTER` to run a Jupyter Notebook with everything configured to listen on the public port (so that you can use it from your browser).
+
+It will output something like:
+
+```
+root@73e0ec1f1ae6:/app# $JUPYTER
+[I 12:02:09.975 NotebookApp] Writing notebook server cookie secret to /root/.local/share/jupyter/runtime/notebook_cookie_secret
+[I 12:02:10.317 NotebookApp] Serving notebooks from local directory: /app
+[I 12:02:10.317 NotebookApp] The Jupyter Notebook is running at:
+[I 12:02:10.317 NotebookApp] http://(73e0ec1f1ae6 or 127.0.0.1):8888/?token=f20939a41524d021fbfc62b31be8ea4dd9232913476f4397
+[I 12:02:10.317 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[W 12:02:10.317 NotebookApp] No web browser found: could not locate runnable browser.
+[C 12:02:10.317 NotebookApp]
+
+    Copy/paste this URL into your browser when you connect for the first time,
+    to login with a token:
+        http://(73e0ec1f1ae6 or 127.0.0.1):8888/?token=f20939a41524d021fbfc62b31be8ea4dd9232913476f4397
+```
+
+you can copy that URL and modify the "host" to be `localhost` or `{{cookiecutter.domain_dev}}`, in the case above, it would be, e.g.:
+
+```
+http://localhost:8888/token=f20939a41524d021fbfc62b31be8ea4dd9232913476f4397
+```
+
+ and then open it in your browser.
+
+You will have a full Jupyter Notebook running inside your container, that has direct access to your database by the name container name, etc. So, you can just copy your backend code and run it directly, without needing to modify it.
+
+If you use tools like [Hydrogen](https://github.com/nteract/hydrogen) or [Visual Studio Code Jupyter](https://donjayamanne.github.io/pythonVSCodeDocs/docs/jupyter/), you can use that same modified URL.
+
+
+### backend tests
+
+To test the backend run:
 
 ```bash
 # Generate the testing docker-stack.yml file with all the needed configurations
@@ -101,6 +197,8 @@ If you don't want to use migrations at all, uncomment the line in the file at `.
 ```python
 Base.metadata.create_all(bind=engine)
 ```
+
+If you don't want to start with the default models and want to remove them / modify them from the beginning without having any previous revision, you can remove the revision files (`.py` Python files) under `./backend/app/alembic/versions/`. And then create a first migration as described above.
 
 ## Front end development
 
@@ -308,7 +406,7 @@ Production URLs, from the branch `production`.
 
 Front end: https://{{cookiecutter.domain_main}}
 
-Back end: https://{{cookiecutter.domain_main}}/api/
+backend: https://{{cookiecutter.domain_main}}/api/
 
 Swagger UI: https://{{cookiecutter.domain_main}}/swagger/
 
@@ -322,7 +420,7 @@ Staging URLs, from the branch `master`.
 
 Front end: https://{{cookiecutter.domain_staging}}
 
-Back end: https://{{cookiecutter.domain_staging}}/api/
+backend: https://{{cookiecutter.domain_staging}}/api/
 
 Swagger UI: https://{{cookiecutter.domain_staging}}/swagger/
 
@@ -336,7 +434,7 @@ Development URLs, for local development. Given that you modified your `hosts` fi
 
 Front end: http://{{cookiecutter.domain_dev}}
 
-Back end: http://{{cookiecutter.domain_dev}}/api/
+backend: http://{{cookiecutter.domain_dev}}/api/
 
 Swagger UI: http://{{cookiecutter.domain_dev}}/swagger/
 
