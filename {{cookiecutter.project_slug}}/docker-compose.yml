@@ -34,4 +34,5 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - FIRST_SUPERUSER={{cookiecutter.first_superuser}}
       - FIRST_SUPERUSER_PASSWORD={{cookiecutter.first_superuser_password}}
+      - USERS_OPEN_REGISTRATION=${USERS_OPEN_REGISTRATION}
   frontend:

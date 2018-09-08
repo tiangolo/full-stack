@@ -111,33 +111,31 @@ def route_users_post(
 
 
 @docs.register
-@doc(
-    description='Create new user without the need to be logged in',
-    tags=['users'])
-@app.route(f'{config.API_V1_STR}/users/open', methods=['POST'])
-@use_kwargs({
-    'email': fields.Str(required=True),
-    'password': fields.Str(required=True),
-    'first_name': fields.Str(),
-    'last_name': fields.Str(),
-    'group_id': fields.Int(required=True),
-})
+@doc(description="Create new user without the need to be logged in", tags=["users"])
+@app.route(f"{config.API_V1_STR}/users/open", methods=["POST"])
+@use_kwargs(
+    {
+        "email": fields.Str(required=True),
+        "password": fields.Str(required=True),
+        "first_name": fields.Str(),
+        "last_name": fields.Str(),
+        "group_id": fields.Int(required=True),
+    }
+)
 @marshal_with(UserSchema())
-def route_users_post_open(email=None,
-                     password=None,
-                     first_name=None,
-                     last_name=None,
-                     group_id=None):
+def route_users_post_open(
+    email=None, password=None, first_name=None, last_name=None, group_id=None
+):
 
     if not config.USERS_OPEN_REGISTRATION:
-        abort(403, 'Open user resgistration is forbidden on this server')
+        abort(403, "Open user resgistration is forbidden on this server")
 
     user = db_session.query(User).filter(User.email == email).first()
 
     if user:
         return abort(
-            400,
-            f'The user with this email already exists in the system: {email}')
+            400, f"The user with this email already exists in the system: {email}"
+        )
 
     group = db_session.query(Group).filter(Group.id == group_id).first()
 
@@ -148,7 +146,8 @@ def route_users_post_open(email=None,
         password=pwd_context.hash(password),
         first_name=first_name,
         last_name=last_name,
-        group=group)
+        group=group,
+    )
 
     db_session.add(user)
     db_session.commit()
@@ -157,11 +156,8 @@ def route_users_post_open(email=None,
 
 
 @docs.register
-@doc(
-    description='Get current user',
-    security=security_params,
-    tags=['users'])
-@app.route(f'{config.API_V1_STR}/users/me', methods=['GET'])
+@doc(description="Get current user", security=security_params, tags=["users"])
+@app.route(f"{config.API_V1_STR}/users/me", methods=["GET"])
 @marshal_with(UserSchema())
 @jwt_required
 def route_users_me_get():

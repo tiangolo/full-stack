@@ -1,11 +1,13 @@
 import os
 
+
 def getenv_boolean(var_name, default_value=False):
     result = default_value
     env_value = os.getenv(var_name)
-    if not env_value is None:
-        result = env_value.upper() in ('TRUE', '1')
+    if env_value is not None:
+        result = env_value.upper() in ("TRUE", "1")
     return result
+
 
 API_V1_STR = "/api/v1"
 
@@ -30,5 +32,3 @@ FIRST_SUPERUSER = os.getenv("FIRST_SUPERUSER")
 FIRST_SUPERUSER_PASSWORD = os.getenv("FIRST_SUPERUSER_PASSWORD")
 
 USERS_OPEN_REGISTRATION = getenv_boolean("USERS_OPEN_REGISTRATION")
-
-
