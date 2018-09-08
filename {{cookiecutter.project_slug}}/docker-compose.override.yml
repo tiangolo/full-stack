@@ -58,7 +58,7 @@ services:
       - FLASK_DEBUG=1
       - 'RUN=flask run --host=0.0.0.0 --port=80'
       - 'JUPYTER=jupyter notebook --ip=0.0.0.0 --allow-root'
-    command: bash -c "while true; do sleep 1; done"
+    # command: bash -c "while true; do sleep 1; done"
     # command: bash -c "flask run --host=0.0.0.0 --port=80"
   celeryworker:
     build:
@@ -85,8 +85,6 @@ services:
     environment:
       - JUPYTER=jupyter notebook --ip=0.0.0.0 --allow-root
       - SERVER_NAME=${DOMAIN}
-      # - SEED=0
-    command: bash -c "while true; do sleep 1; done"
     volumes:
       - ./backend/app:/app
       # For Hydrogen Jupyter easy integration with
