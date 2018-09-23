@@ -10,7 +10,7 @@ services:
   swagger-ui:
     image: swaggerapi/swagger-ui
   proxy:
-    image: traefik:v1.5
+    image: traefik:v1.6
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   flower:
