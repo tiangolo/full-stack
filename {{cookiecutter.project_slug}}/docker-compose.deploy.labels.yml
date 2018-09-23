@@ -1,12 +1,5 @@
 version: '3'
 services:
-  db:
-    volumes:
-      - app-db-data:/var/lib/postgresql/data/pgdata
-    deploy:
-      placement:
-        constraints:
-          - node.labels.${STACK_NAME}.app-db-data == true
   pgadmin:
     deploy:
       labels:
@@ -20,9 +13,6 @@ services:
         - traefik.redirectorservice.frontend.redirect.entryPoint=https
         # Traefik service that listens to HTTPS
         - traefik.webservice.frontend.entryPoints=https
-    networks:
-      - {{cookiecutter.traefik_public_network}}
-      - default
   swagger-ui:
     deploy:
       labels:
@@ -30,21 +20,8 @@ services:
       - traefik.enable=true
       - traefik.port=8080
       - traefik.tags=${TRAEFIK_TAG}
-    environment:
-      - API_URL=https://${DOMAIN}/api/v1/swagger/
   proxy:
-    command: --docker \
-      --docker.swarmmode \
-      --docker.watch \
-      --docker.exposedbydefault=false \
-      --constraints=tag==${TRAEFIK_TAG} \
-      --logLevel=DEBUG \
-      --accessLog \
-      --web
     deploy:
-      placement:
-        constraints:
-          - node.role == manager
       labels:
         # For the configured domain
         - traefik.frontend.rule=Host:${DOMAIN}
@@ -67,9 +44,6 @@ services:
         # - "traefik.servicehttps.frontend.redirect.replacement=https://www.${DOMAIN}/$$3"
         # To redirect from www to non-www un-comment the line below
         # - "traefik.servicehttps.frontend.redirect.replacement=https://${DOMAIN}/$$3"
-    networks:
-      - {{cookiecutter.traefik_public_network}}
-      - default
   flower:
     deploy:
       labels:
@@ -83,9 +57,6 @@ services:
         - traefik.redirectorservice.frontend.redirect.entryPoint=https
         # Traefik service that listens to HTTPS
         - traefik.webservice.frontend.entryPoints=https
-    networks:
-      - {{cookiecutter.traefik_public_network}}
-      - default
   backend:
     deploy:
       labels:
@@ -100,10 +71,3 @@ services:
         - traefik.enable=true
         - traefik.port=80
         - traefik.tags=${TRAEFIK_TAG}
-
-volumes:
-  app-db-data:
-
-networks:
-  {{cookiecutter.traefik_public_network}}:
-    external: true

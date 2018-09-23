@@ -9,6 +9,8 @@ services:
       - DEFAULT_PASSWORD={{cookiecutter.pgadmin_default_user_password}}
   swagger-ui:
     image: swaggerapi/swagger-ui
+    environment:
+      - API_URL=https://${DOMAIN}/api/v1/swagger/
   proxy:
     image: traefik:v1.6
     volumes:

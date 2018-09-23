@@ -1,0 +1,25 @@
+version: '3'
+services:
+  swagger-ui:
+    labels:
+      - traefik.frontend.rule=PathPrefixStrip:/swagger/
+      - traefik.enable=true
+      - traefik.port=8080
+      - traefik.tags=${TRAEFIK_TAG}
+  proxy:
+    labels:
+      - traefik.frontend.rule=Host:${DOMAIN}
+      - traefik.enable=true
+      - traefik.port=80
+  backend:
+    labels:
+      - traefik.frontend.rule=PathPrefix:/api
+      - traefik.enable=true
+      - traefik.port=80
+      - traefik.tags=${TRAEFIK_TAG}
+  frontend:
+    labels:
+      - traefik.frontend.rule=PathPrefix:/
+      - traefik.enable=true
+      - traefik.port=80
+      - traefik.tags=${TRAEFIK_TAG}

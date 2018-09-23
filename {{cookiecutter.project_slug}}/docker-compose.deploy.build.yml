@@ -12,4 +12,4 @@ services:
     build: 
       context: ./frontend
       args:
-          env: ${ENV-prod}
+          configuration: ${FRONTEND_CONFIGURATION-production}

@@ -1,0 +1,18 @@
+version: '3'
+services:
+  pgadmin:
+    networks:
+      - {{cookiecutter.traefik_public_network}}
+      - default
+  proxy:
+    networks:
+      - {{cookiecutter.traefik_public_network}}
+      - default
+  flower:
+    networks:
+      - {{cookiecutter.traefik_public_network}}
+      - default
+
+networks:
+  {{cookiecutter.traefik_public_network}}:
+    external: true
