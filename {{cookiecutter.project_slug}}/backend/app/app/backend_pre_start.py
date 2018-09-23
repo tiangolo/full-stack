@@ -20,7 +20,7 @@ wait_seconds = 1
 )
 def init():
     # Try to create session to check if DB is awake
-    db_session.execute('SELECT 1')
+    db_session.execute("SELECT 1")
 
 
 def main():

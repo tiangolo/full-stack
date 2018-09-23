@@ -20,7 +20,7 @@ wait_seconds = 1
 )
 def init():
     # Try to create session to check if DB is awake
-    db_session.execute('SELECT 1')
+    db_session.execute("SELECT 1")
     # Wait for API to be awake, run one simple tests to authenticate
     test_get_access_token()
 
