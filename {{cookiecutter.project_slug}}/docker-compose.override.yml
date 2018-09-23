@@ -33,6 +33,7 @@ services:
   backend:
     build: 
       context: ./backend
+      dockerfile: backend.dockerfile
       args: 
         env: dev
     labels:
@@ -63,7 +64,7 @@ services:
   celeryworker:
     build:
       context: ./backend
-      dockerfile: Dockerfile-celery-worker
+      dockerfile: celeryworker.dockerfile
       args: 
         env: dev
     environment:
@@ -79,7 +80,7 @@ services:
   backend-tests:
     build:
       context: ./backend
-      dockerfile: Dockerfile-tests
+      dockerfile: tests.dockerfile
       args: 
         env: dev
     environment:
