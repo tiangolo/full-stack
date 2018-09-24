@@ -12,39 +12,7 @@ stages:
 tests:
   stage: test
   script:
-    - >
-      DOMAIN=backend
-      ENV=stag
-      docker-compose
-      -f docker-compose.yml
-      -f docker-compose.build.yml
-      -f docker-compose.test.yml
-      config > docker-stack.yml
-    - docker-compose -f docker-stack.yml build
-    - docker-compose -f docker-stack.yml down -v --remove-orphans # Remove possibly previous broken stacks left hanging after an error
-    - docker-compose -f docker-stack.yml up -d
-    - docker-compose -f docker-stack.yml exec -T backend-tests /start.sh
-    - docker-compose -f docker-stack.yml down -v --remove-orphans
-  tags:
-    - build
-    - test
-
-build-branch:
-  stage: build
-  script:
-    - >
-      TAG=stag
-      ENV=stag
-      docker-compose
-      -f docker-compose.images.yml
-      -f docker-compose.build.yml
-      config > docker-stack.yml
-    - docker-compose -f docker-stack.yml build
-    - docker-compose -f docker-stack.yml push
-  except:
-    - master
-    - production
-    - tags
+    - sh ./script-test.sh
   tags:
     - build
     - test
@@ -52,15 +20,7 @@ build-branch:
 build-stag:
   stage: build
   script:
-    - >
-      TAG=stag
-      ENV=stag
-      docker-compose
-      -f docker-compose.images.yml
-      -f docker-compose.build.yml
-      config > docker-stack.yml
-    - docker-compose -f docker-stack.yml build
-    - docker-compose -f docker-stack.yml push
+    - TAG=stag FRONTEND_ENV=stag sh ./script-build-push.sh
   only:
     - master
   tags:
@@ -70,14 +30,7 @@ build-stag:
 build-prod:
   stage: build
   script:
-    - >
-      TAG=prod
-      docker-compose
-      -f docker-compose.images.yml
-      -f docker-compose.build.yml
-      config > docker-stack.yml
-    - docker-compose -f docker-stack.yml build
-    - docker-compose -f docker-stack.yml push
+    - TAG=prod sh ./script-build-push.sh
   only:
     - production
   tags:
@@ -93,14 +46,7 @@ deploy-stag:
       TRAEFIK_PUBLIC_TAG={{cookiecutter.traefik_public_constraint_tag}}
       STACK_NAME={{cookiecutter.docker_swarm_stack_name_staging}}
       TAG=stag
-      docker-compose
-      -f docker-compose.yml
-      -f docker-compose.admin.yml
-      -f docker-compose.images.yml
-      -f docker-compose.deploy.yml
-      config > docker-stack.yml
-    - docker-auto-labels docker-stack.yml
-    - docker stack deploy -c docker-stack.yml --with-registry-auth {{cookiecutter.docker_swarm_stack_name_staging}}
+      sh ./script-deploy.sh
   environment:
     name: staging
     url: https://{{cookiecutter.domain_staging}}
@@ -119,14 +65,7 @@ deploy-prod:
       TRAEFIK_PUBLIC_TAG={{cookiecutter.traefik_public_constraint_tag}}
       STACK_NAME={{cookiecutter.docker_swarm_stack_name_main}}
       TAG=prod
-      docker-compose
-      -f docker-compose.yml
-      -f docker-compose.admin.yml
-      -f docker-compose.images.yml
-      -f docker-compose.deploy.yml
-      config > docker-stack.yml
-    - docker-auto-labels docker-stack.yml
-    - docker stack deploy -c docker-stack.yml --with-registry-auth {{cookiecutter.docker_swarm_stack_name_main}}
+      sh ./script-deploy.sh
   environment:
     name: production
     url: https://{{cookiecutter.domain_main}}
