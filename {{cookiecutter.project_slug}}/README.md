@@ -2,7 +2,7 @@
 
 ## Backend local development, first steps
 
-* Update your local `hosts` file, set the IP `127.0.0.1` (your `localhost`) to `{{cookiecutter.domain_dev}}`. The `docker-compose.override.yml` file will set the environment variable `SERVER_NAME` to that host. Otherwise you would receive 404 HTTP errors and "Cross Origin Resource Sharing" (CORS) errors.
+* Update your local `hosts` file, set the IP `127.0.0.1` (your `localhost`) to `{{cookiecutter.domain_dev}}`. The `docker-compose.dev.env.yml` file(that will be one of the Docker Compose files used by default) will set the environment variable `SERVER_NAME` to that host. Otherwise you would receive 404 HTTP errors and "Cross Origin Resource Sharing" (CORS) errors.
 
 * Modify your hosts file, for macOS and Linux, probably in `/etc/hosts`. For Windows, in `c:\Windows\System32\Drivers\etc\hosts` to include:
 
@@ -45,17 +45,17 @@ Add and modify tasks to the Celery worker in `./backend/app/app/worker.py`.
 
 If you need to install any additional package to the worker, add it to the file `./backend/app/Dockerfile-celery-worker`.
 
-There is an `.env` file that has some Docker Compose default values that allow you to just run `docker-compose up -d` and start working, while still being able to use the same Docker Compose files for deployment, avoiding repetition of code and configuration as much as possible.
+There is an `.env` file that has some Docker Compose default values that allow you to just run `docker-compose up -d` and start working, while still being able to use and share the same Docker Compose files for deployment, avoiding repetition of code and configuration as much as possible.
 
 ### Docker Compose Override
 
-During development, you can change Docker Compose settings that will only affect the local development environment, in the file `docker-compose.override.yml`.
+During development, you can change Docker Compose settings that will only affect the local development environment, in the files `docker-compose.dev.*.yml`.
 
 The changes to those files only affect the local development environment, not the production environment. So, you can add "temporal" changes that help the development workflow.
 
-For example, the directory with the backend code is mounted as a Docker "host volume", mapping the code you change live to the directory inside the container. That allows you to test your changes right away, without having to build the Docker image again. It should only be done during development, for production, you should build the Docker image with a recent version of the backend code. But during development, it allows you to iterate very fast.
+For example, the directory with the backend code is mounted as a Docker "host volume" (in the file `docker-compose.dev.volumes.yml`), mapping the code you change live to the directory inside the container. That allows you to test your changes right away, without having to build the Docker image again. It should only be done during development, for production, you should build the Docker image with a recent version of the backend code. But during development, it allows you to iterate very fast.
 
-There is also a commented out `command` override, if you want to enable it, uncomment it. It makes the backend container run a process that does "nothing", but keeps the process running. That allows you to get inside your living container and run commands inside, for example a Python interpreter to test installed dependencies, or start the Flask development server that reloads when it detectes changes.
+There is also a commented out `command` override (in the file `docker-compose.dev.command.yml`), if you want to enable it, uncomment it. It makes the backend container run a process that does "nothing", but keeps the process running. That allows you to get inside your living container and run commands inside, for example a Python interpreter to test installed dependencies, or start the Flask development server that reloads when it detectes changes.
 
 To get inside the container with a `bash` session you can start the stack with:
 
@@ -77,7 +77,7 @@ root@7f2607af31c3:/app#
 
 that means that you are in a `bash` session inside your container, as a `root` user, under the `/app` directory.
 
-The file `docker-compose.override.yml` also has the declaration of an environment variable `$RUN` to run the Flask development server, with all the configurations to make it work in Docker. You can "run" that environment variable and it will start that Flask development server with:
+There is also a declaration of an environment variable `$RUN` to run the Flask development server (in the file `docker-compose.dev.env.yml`), with all the configurations to make it work in Docker. You can "run" that environment variable and it will start that Flask development server with:
 
 ```bash
 $RUN
@@ -101,7 +101,7 @@ The Celery worker has a `$RUN` variable too, running the Celery worker, so that 
 
 If you know about Python [Jupyter Notebooks](http://jupyter.org/), you can take advantage of them during local development.
 
-The `docker-compose.override.yml` file sends a variable `env` with a value `dev ` the the build process of the Docker image (during local development) and the `Dockerfile` has steps to then install and configure Jupyter inside your Docker container.
+The `docker-compose.dev.build.yml` file sends a variable `env` with a value `dev ` to the build process of the Docker image (during local development) and the `Dockerfile` has steps to then install and configure Jupyter inside your Docker container.
 
 So, you can enter into the Docker running container:
 
@@ -146,39 +146,31 @@ If you use tools like [Hydrogen](https://github.com/nteract/hydrogen) or [Visual
 To test the backend run:
 
 ```bash
-# Generate the testing docker-stack.yml file with all the needed configurations
-DOMAIN=backend docker-compose -f docker-compose.yml -f docker-compose.build.yml -f docker-compose.test.yml config > docker-stack.yml
-# Build the testing stack
-docker-compose -f docker-stack.yml build
-# Start the testing stack
-docker-compose -f docker-stack.yml up -d
-sleep 20; # Give some time for the DB and prestart script to finish
-# Run the REST tests
-docker-compose -f docker-stack.yml exec -T backend-tests pytest
-# Stop and eliminate the testing stack
-docker-compose -f docker-stack.yml down -v --remove-orphans
+DOMAIN=backend sh ./script-test.sh
 ```
+
+The file `./script-test.sh` has the commands to generate a testing `docker-stack.yml` file from the needed Docker Compose files, start the stack and test it.
 
 The tests run with Pytest, modify and add tests to `./backend/app/app/tests/`.
 
-If you need to install any additional package for the REST tests, add it to the file `./backend/app/Dockerfile-tests`.
+If you need to install any additional package for the tests, add it to the file `./backend/app/tests.dockerfile`.
 
-If you use GitLab CI the tests will run automatically.
+If you use GitLab CI the tests will automaticall.dockerfiley.
 
 
 ### Migrations
 
-As the `docker-compose.override.yml` file for local development mounts your app directory as a volume inside the container, you can also run the migrations with `alembic` commands inside the container and the migration code will be in your app directory (instead of being only inside the container). So you can add it to your git repository.
+As in local development your app directory is mounted as a volume inside the container (set in the file `docker-compose.dev.volumes.yml`), you can also run the migrations with `alembic` commands inside the container and the migration code will be in your app directory (instead of being only inside the container). So you can add it to your git repository.
 
-Make sure you create at least one "revision" of your models and that you "upgrade" your database with that revision at least once. As this is what will create the tables in your database. Otherwise, your application won't run.
+Make sure you create a "revision" of your models and that you "upgrade" your database with that revision every time you change them. As this is what will update the tables in your database. Otherwise, your application will have errors.
 
-* Start an interactive session in the server container that is running an infinite loop doing nothing:
+* Start an interactive session in the backend container:
 
 ```bash
 docker-compose exec backend bash
 ```
 
-* After changing a model (for example, adding a column) or when you are just starting, inside the container, create a revision, e.g.:
+* After changing a model (for example, adding a column), inside the container, create a revision, e.g.:
 
 ```bash
 alembic revision --autogenerate -m "Add column last_name to User model"
@@ -192,13 +184,19 @@ alembic revision --autogenerate -m "Add column last_name to User model"
 alembic upgrade head
 ```
 
-If you don't want to use migrations at all, uncomment the line in the file at `./backend/app/app/core/database.py` with:
+If you don't want to use migrations at all, uncomment the line in the file at `./backend/app/app/db/init_db.py` with:
 
 ```python
 Base.metadata.create_all(bind=engine)
 ```
 
-If you don't want to start with the default models and want to remove them / modify them from the beginning without having any previous revision, you can remove the revision files (`.py` Python files) under `./backend/app/alembic/versions/`. And then create a first migration as described above.
+and comment the line in the file `prestart.sh` that contains:
+
+```bash
+alembic upgrade head
+```
+
+If you don't want to start with the default models and want to remove them / modify them, from the beginning, without having any previous revision, you can remove the revision files (`.py` Python files) under `./backend/app/alembic/versions/`. And then create a first migration as described above.
 
 ## Front end development
 
@@ -227,19 +225,19 @@ To solve that, you can put constraints in the services that use one or more data
 
 #### Adding services with volumes
 
-For each service that uses a volume (databases, services with uploaded files, etc) you should have a label constraint in your `docker-compose.deploy.yml`.
+For each service that uses a volume (databases, services with uploaded files, etc) you should have a label constraint in your `docker-compose.deploy.volumes-placement.yml` file.
 
 To make sure that your labels are unique per volume per stack (for examlpe, that they are not the same for `prod` and `stag`) you should prefix them with the name of your stack and then use the same name of the volume.
 
 Then you need to have those constraints in your deployment Docker Compose file for the services that need to be fixed with each volume.
 
-To be able to use a single `docker-compose.deploy.yml` for deployments in different environments, like `prod` and `stag`, you can pass the name of the stack as an environment variable. Like:
+To be able to use different environments, like `prod` and `stag`, you should pass the name of the stack as an environment variable. Like:
 
 ```bash
-STACK_NAME={{cookiecutter.docker_swarm_stack_name_main}} docker-compose -f docker-compose.deploy.yml config > docker-stack.yml
+STACK_NAME={{cookiecutter.docker_swarm_stack_name_staging}} sh ./script-deploy.sh
 ```
 
-To use and expand that environment variable inside the `docker-compose.deploy.yml` file you can add the constraints to the services like:
+To use and expand that environment variable inside the `docker-compose.deploy.volumes-placement.yml` files you can add the constraints to the services like:
 
 ```yaml
 version: '3'
@@ -253,7 +251,7 @@ services:
           - node.labels.${STACK_NAME}.app-db-data == true
 ```
 
-note the `${STACK_NAME}`. With the previous command, that `docker-compose.deploy.yml` would be converted and saved to a file `docker-stack.yml` containing:
+note the `${STACK_NAME}`. In the script `./script-deploy.sh`, that `docker-compose.deploy.volumes-placement.yml` would be converted, and saved to a file `docker-stack.yml` containing:
 
 ```yaml
 version: '3'
@@ -353,7 +351,9 @@ docker stack deploy -c docker-stack.yml --with-registry-auth {{cookiecutter.dock
 
 ### Continuous Integration / Continuous Delivery
 
-If you use GitLab CI, the included .gitlab-ci.yml can automatically deploy it. You may need to update it according to your GitLab configurations.
+If you use GitLab CI, the included `.gitlab-ci.yml` can automatically deploy it. You may need to update it according to your GitLab configurations.
+
+If you use any other CI / CD provider, you can base your deployment from that `.gitlab-ci.yml` file, as all the actual script steps are performed in `bash` scripts that you can easily re-use.
 
 GitLab CI is configured assuming 2 environments following GitLab flow:
 
@@ -369,11 +369,11 @@ There are several Docker Compose files, each with a specific purpose.
 
 They are designed to provide several "stages": development, building, testing, deployment to different environments like staging and production (and you can add more environments very easily).
 
-And they are designed to have the minimum repetition of code and configurations, so that if you need to change something, you have to change it in the minimum amount of places. That's why several of the files use environment variables that get auto-expanded. That way, if, for example, you want to use a different domain, you can call the `docker-compose` command with a different `DOMAIN` environment variable instead of having to change the domain in several places inside the Docker Compose files.
+They are designed to have the minimum repetition of code and configurations, so that if you need to change something, you have to change it in the minimum amount of places. That's why several of the files use environment variables that get auto-expanded. That way, if for example, you want to use a different domain, you can call the `docker-compose` command with a different `DOMAIN` environment variable instead of having to change the domain in several places inside the Docker Compose files.
 
 Also, if you want to have another deployment environment, say `preprod`, you just have to change environment variables, but you can keep using the same Docker Compose files.
 
-Because of that, for each "stage" you would use a different set of Docker Compose files.
+Because of that, for each "stage" (development, building, testing, deployment) you would use a different set of Docker Compose files.
 
 But you probably don't have to worry about the different files, for building, testing and deployment, you would probably use a CI system (like GitLab CI) and the different configured files would be already set there.
 
@@ -388,12 +388,23 @@ and it will do the right thing.
 
 The purpose of each Docker Compose file is:
 
-* `docker-compose.yml`: main services base configurations; dependencies between base services; environment variables like default superuser, database password, etc.
-* `docker-compose.override.yml`: modifications and configurations strictly for development. Like mounting the code directory as a volume.
-* `docker-compose.admin.yml`: additional services for administration or utilities with their configurations, like PGAdmin and Swagger, that are not needed during testing and use external images (don't need to be built or create images).
-* `docker-compose.build.yml`: build directories and Dockerfiles.
-* `docker-compose.deploy.yml`: Docker Swarm mode cluster deployment configurations. Includes volumes, node constraints, Traefik labels for path based proxy forwarding, TLS (HTTPS) certificate generation with Traefik and Let's encrypt, Docker network configurations for Traefik internal proxy and public proxy, production specific environment variables, production specific Traefik internal proxy configurations.
-* `docker-compose.images.yml`: image names to be created, with environment variables for the specific tag.
+* `docker-compose.deploy.build.yml`: build directories and `Dockerfile`s, for deployment (the building process for development has a little difference).
+* `docker-compose.deploy.command.yml`: command overrides for images only during deployment. Initially only for the main Traefik proxy, making it run in a Docker Swarm mode cluster.
+* `docker-compose.deploy.images.yml`: image names to be created, with environment variables for the specific tag.
+* `docker-compose.deploy.labels.yml`: labels for deployment, the configurations to make the internal Traefik proxy serve some services on specific URLs, some with basic HTTP auth, etc. Also labels used in the internal Traefik proxy container to make it talk to the public Traefik proxy (outside of this stack) and make it send requests for this domain, generate HTTPS certificates, etc.
+* `docker-compose.deploy.networks.yml`: networks that have to be used and shared by containers that need to be able to talk to the public Traefik proxy (when a service requires a domain for itself).
+* `docker-compose.deploy.volumes-placement.yml`: volume declarations, volumes used by stateful services (as databases) and volume placement constraints, to make those services always run on the node that has their volumes, even after stack updates.
+* `docker-compose.dev.build.yml`: build directories and `Dockerfile`s, for local development, sets a built-time argument that then is used in the `Dockerfile`s to install and configure helper tools exclusively for development.
+* `docker-compose.dev.command.yml`: command overrides for local development. To tell the internal Traefik proxy to work with a local Docker in the host instead of a Docker Swarm mode cluster. And (commented out but ready to be used) overrides to make the containers run an infinite loop while keeping alive to be able to run the development server manually or do any other interactive work.
+* `docker-compose.dev.env.yml`: development environment variable overrides.
+* `docker-compose.dev.labels.yml`: local development labels, to be used by the local development Traefik proxy. They have to be declared in a different place than for deployment.
+* `docker-compose.dev.networks.yml`: local development networks, to enable interactively talking to the backend.
+* `docker-compose.dev.ports.yml`: local development port mappings.
+* `docker-compose.dev.volumes.yml`: local development mounted volumes, mainly to map the development code directory inside the container, for fast development without needing to re-build the images.
+* `docker-compose.shared.admin.yml`: additional services for administration or utilities with their configurations, like PGAdmin and Swagger, that are not needed during testing and use external images (don't need to be built or create images).
+* `docker-compose.shared.base-images.yml`: base Docker images used without modification for shared services, as databases. Used in deployment, development, testing, etc.
+* `docker-compose.shared.depends.yml`: dependencies between main services with `depends_on`, used in deployment, development, testing, etc.
+* `docker-compose.shared.env.yml`: environment variables used by services, as database passwords, secret keys, etc.
 * `docker-compose.test.yml`: specific additional container to be used only during testing, mainly the container that tests the backend and the APIs.
 
 ## URLs
