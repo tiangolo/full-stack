@@ -9,11 +9,11 @@ RUN npm install
 
 COPY ./ /app/
 
-ARG configuration=production
+ARG FRONTEND_ENV=production
 
 RUN npm run test:prod
 
-RUN npm run build -- --output-path=./dist/out --configuration $configuration
+RUN npm run build -- --output-path=./dist/out --configuration $FRONTEND_ENV
 
 
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx

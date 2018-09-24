@@ -22,4 +22,4 @@ services:
     build: 
       context: ./frontend
       args: 
-          env: dev
+        FRONTEND_ENV: dev
