@@ -1,6 +1,6 @@
 FROM python:3.6
 
-RUN pip install requests faker==0.8.4 pytest tenacity psycopg2-binary SQLAlchemy==1.1.13
+RUN pip install requests faker==0.8.4 pytest tenacity psycopg2-binary SQLAlchemy==1.1.13 passlib[bcrypt]
 
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:
@@ -12,12 +12,12 @@ COPY ./app /app
 
 ENV PYTHONPATH=/app
 
-COPY ./app/tests_start.sh /start.sh
+COPY ./app/tests-start.sh /tests-start.sh
 
-RUN chmod +x /start.sh
+RUN chmod +x /tests-start.sh
 
 # This will make the container wait, doing nothing, but alive
 CMD ["bash", "-c", "while true; do sleep 1; done"]
 
-# Afterwards you can exec a command /start.sh in the live container, like:
-# docker exec -it backend-tests /start.sh
+# Afterwards you can exec a command /tests-start.sh in the live container, like:
+# docker exec -it backend-tests /tests-start.sh
