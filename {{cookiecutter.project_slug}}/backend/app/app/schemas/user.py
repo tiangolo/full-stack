@@ -7,7 +7,7 @@ from marshmallow import fields
 
 # Import app code
 from .base import BaseSchema
-from .group import GroupSchema
+from .role import RoleSchema
 
 
 class UserSchema(BaseSchema):
@@ -19,5 +19,4 @@ class UserSchema(BaseSchema):
     email = fields.Email()
     is_active = fields.Bool()
     is_superuser = fields.Bool()
-    group = fields.Nested(GroupSchema, only=("id", "name"))
-    groups_admin = fields.Nested(GroupSchema, only=("id", "name"), many=True)
+    roles = fields.Nested(RoleSchema, only=("id", "name"), many=True)
