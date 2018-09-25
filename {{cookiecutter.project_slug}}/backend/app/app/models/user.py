@@ -9,10 +9,9 @@ from sqlalchemy.orm import relationship
 
 # Import app code
 from app.db.base_class import Base
-from app.models.base_relations import groups_admin_users
+from app.models.base_relations import users_roles
 
 # Typings, for autocompletion (VS Code with Python plug-in)
-from . import group as group_model  # noqa
 from typing import List  # noqa
 
 
@@ -27,9 +26,6 @@ class User(Base):
     is_active = Column(Boolean(), default=True)
     is_superuser = Column(Boolean(), default=False)
     # Relationships
-    group_id = Column(Integer, ForeignKey("group.id"), index=True)
-    group = relationship("Group", back_populates="users")  # type: group_model.Group
-    # If this user is admin of one or more groups, they will be here
-    groups_admin = relationship(
-        "Group", secondary=groups_admin_users, back_populates="users_admin"
-    )  # type: List[group.Group]
+    roles = relationship(
+        "Role", secondary=users_roles, back_populates="users"
+    )  # type: List[role.Role]

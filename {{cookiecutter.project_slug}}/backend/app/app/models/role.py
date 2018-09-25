@@ -9,16 +9,15 @@ from sqlalchemy.orm import relationship
 
 # Import app code
 from app.db.base_class import Base
-from app.models.base_relations import groups_admin_users
+from app.models.base_relations import users_roles
 
 
-class Group(Base):
+class Role(Base):
     # Own properties
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow(), index=True)
     name = Column(String, index=True)
     # Relationships
-    users = relationship("User", back_populates="group")
-    users_admin = relationship(
-        "User", secondary=groups_admin_users, back_populates="groups_admin"
+    users = relationship(
+        "User", secondary=users_roles, back_populates="roles"
     )
