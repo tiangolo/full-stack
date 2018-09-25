@@ -43,7 +43,7 @@ Add and modify SQLAlchemy models to `./backend/app/app/models/`, Marshmallow sch
 
 Add and modify tasks to the Celery worker in `./backend/app/app/worker.py`. 
 
-If you need to install any additional package to the worker, add it to the file `./backend/app/Dockerfile-celery-worker`.
+If you need to install any additional package to the worker, add it to the file `./backend/app/celeryworker.dockerfile`.
 
 There is an `.env` file that has some Docker Compose default values that allow you to just run `docker-compose up -d` and start working, while still being able to use and share the same Docker Compose files for deployment, avoiding repetition of code and configuration as much as possible.
 
@@ -141,7 +141,7 @@ You will have a full Jupyter Notebook running inside your container, that has di
 If you use tools like [Hydrogen](https://github.com/nteract/hydrogen) or [Visual Studio Code Jupyter](https://donjayamanne.github.io/pythonVSCodeDocs/docs/jupyter/), you can use that same modified URL.
 
 
-### backend tests
+### Backend tests
 
 To test the backend run:
 
@@ -198,7 +198,7 @@ alembic upgrade head
 
 If you don't want to start with the default models and want to remove them / modify them, from the beginning, without having any previous revision, you can remove the revision files (`.py` Python files) under `./backend/app/alembic/versions/`. And then create a first migration as described above.
 
-## Front end development
+## Frontend development
 
 * Enter the `frontend` directory, install the NPM packages and start it the `npm` scrits:
 
@@ -325,7 +325,7 @@ docker node update --label-add {{cookiecutter.docker_swarm_stack_name_staging}}.
 
 ### Deploy to a Docker Swarm mode cluster
 
-To deploy to production you need to first generate a `docker-stack.yml` file with:
+To deploy to production you need to first generate a `docker-stack.yml` file. To do it, you set the environment variables used by Docker Compose, as `DOMAIN`, then call `docker-compose` passing the `docker-compose.*.yml` files, and the sub-command `config`, that generates the final Docker Compose / Docker stack contents, then you send those contents to a `docker-stack.yml` file, e.g.:
 
 ```bash
 DOMAIN={{cookiecutter.domain_main}} \
@@ -334,16 +334,21 @@ TRAEFIK_PUBLIC_TAG={{cookiecutter.traefik_public_constraint_tag}} \
 STACK_NAME={{cookiecutter.docker_swarm_stack_name_main}} \
 TAG=prod \
 docker-compose \
--f docker-compose.yml \
--f docker-compose.admin.yml \
--f docker-compose.images.yml \
--f docker-compose.deploy.yml \
+-f docker-compose.shared.admin.yml \
+-f docker-compose.shared.base-images.yml \
+-f docker-compose.shared.depends.yml \
+-f docker-compose.shared.env.yml \
+-f docker-compose.deploy.command.yml \
+-f docker-compose.deploy.images.yml \
+-f docker-compose.deploy.labels.yml \
+-f docker-compose.deploy.networks.yml \
+-f docker-compose.deploy.volumes-placement.yml \
 config > docker-stack.yml
 ```
 
-By passing the environment variables and using different combined Docker Compose files you have less repetition of code and configurations. So, if you change your mind and, for example, want to deploy everything to a different domain, you only have to change the `DOMAIN` environment variable, instead of having to change many different points in different files. The same would happen if you wanted to add a different version / environment of your stack, like "`preproduction`", you would only have to set `TAG=preproduction` in your command.
+By passing the environment variables and using different combined Docker Compose files you have less repetition of code and configurations. So, if you change your mind and, for example, want to deploy everything to a different domain, you only have to change the `DOMAIN` environment variable, instead of having to change many different points in different files. The same would happen if you wanted to add a different version / environment of your stack, like "`preproduction`", you would only have to set `TAG=preproduction` in your command. And also, some of these files are used during development too.
 
-and then you can deploy that stack with:
+Then you can deploy that stack with:
 
 ```bash
 docker stack deploy -c docker-stack.yml --with-registry-auth {{cookiecutter.docker_swarm_stack_name_main}}
@@ -367,7 +372,7 @@ If you need to add more environments, for example, you could imagine using a cli
 
 There are several Docker Compose files, each with a specific purpose.
 
-They are designed to provide several "stages": development, building, testing, deployment to different environments like staging and production (and you can add more environments very easily).
+They are designed to support several "stages", like development, building, testing, and deployment. Also, allowing the deployment to different environments like staging and production (and you can add more environments very easily).
 
 They are designed to have the minimum repetition of code and configurations, so that if you need to change something, you have to change it in the minimum amount of places. That's why several of the files use environment variables that get auto-expanded. That way, if for example, you want to use a different domain, you can call the `docker-compose` command with a different `DOMAIN` environment variable instead of having to change the domain in several places inside the Docker Compose files.
 
@@ -385,6 +390,7 @@ docker-compose up -d
 
 and it will do the right thing.
 
+They are also separated by the common tasks and functionalities they solve, and they are named accordinly. So, although there are many Docker Compose files, each one has a name that shows what should be in there, and the contents tend to be small and specific. That makes it easier to modify, or add configurations, as you can go directly to the relevant file.
 
 The purpose of each Docker Compose file is:
 
@@ -415,9 +421,9 @@ These are the URLs that will be used and generated by the project.
 
 Production URLs, from the branch `production`.
 
-Front end: https://{{cookiecutter.domain_main}}
+Frontend: https://{{cookiecutter.domain_main}}
 
-backend: https://{{cookiecutter.domain_main}}/api/
+Backend: https://{{cookiecutter.domain_main}}/api/
 
 Swagger UI: https://{{cookiecutter.domain_main}}/swagger/
 
@@ -429,9 +435,9 @@ Flower: https://flower.{{cookiecutter.domain_main}}
 
 Staging URLs, from the branch `master`.
 
-Front end: https://{{cookiecutter.domain_staging}}
+Frontend: https://{{cookiecutter.domain_staging}}
 
-backend: https://{{cookiecutter.domain_staging}}/api/
+Backend: https://{{cookiecutter.domain_staging}}/api/
 
 Swagger UI: https://{{cookiecutter.domain_staging}}/swagger/
 
@@ -443,9 +449,9 @@ Flower: https://flower.{{cookiecutter.domain_staging}}
 
 Development URLs, for local development. Given that you modified your `hosts` file.
 
-Front end: http://{{cookiecutter.domain_dev}}
+Frontend: http://{{cookiecutter.domain_dev}}
 
-backend: http://{{cookiecutter.domain_dev}}/api/
+Brontend: http://{{cookiecutter.domain_dev}}/api/
 
 Swagger UI: http://{{cookiecutter.domain_dev}}/swagger/
 
