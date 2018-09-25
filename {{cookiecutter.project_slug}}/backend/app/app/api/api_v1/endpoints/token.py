@@ -8,11 +8,12 @@ from flask_jwt_extended import create_access_token, get_current_user, jwt_requir
 from webargs import fields
 
 # Import app code
-from app.main import app
 from ..api_docs import docs, security_params
 from app.core import config
-from app.core.security import pwd_context
+from app.core.security import pwd_context, verify_password
 from app.db.flask_session import db_session
+from app.db.utils import get_user_by_username, get_user_hashed_password, get_user_id
+from app.main import app
 
 # Import Schemas
 from app.schemas.token import TokenSchema
@@ -33,15 +34,16 @@ from app.models.user import User
 )
 @marshal_with(TokenSchema())
 def route_login_access_token(username, password):
-    user = db_session.query(User).filter(User.email == username).first()
-    if not user or not pwd_context.verify(password, user.password):
+    user = get_user_by_username(username, db_session)
+
+    if not user or not verify_password(password, get_user_hashed_password(user)):
         abort(400, "Incorrect email or password")
     elif not user.is_active:
         abort(400, "Inactive user")
     access_token_expires = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {
         "access_token": create_access_token(
-            identity=user.id, expires_delta=access_token_expires
+            identity=get_user_id(user), expires_delta=access_token_expires
         ),
         "token_type": "bearer",
     }
