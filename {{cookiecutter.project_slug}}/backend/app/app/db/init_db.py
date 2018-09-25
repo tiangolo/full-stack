@@ -1,9 +1,11 @@
 from app.core import config
 from app.core.security import pwd_context
 
-from app.models.user import User
-from app.models.group import Group
+from app.db.utils import get_role_by_name, create_role, get_user_by_username, create_user, assign_role_to_user
+from app.core.security import get_password_hash
 
+from app.models.user import User
+from app.models.role import Role
 
 def init_db(db_session):
     # Tables should be created with Alembic migrations
@@ -11,20 +13,11 @@ def init_db(db_session):
     # the tables uncommenting the next line
     # Base.metadata.create_all(bind=engine)
 
-    group = db_session.query(Group).filter(Group.name == "default").first()
-    if not group:
-        group = Group(name="default")
-        db_session.add(group)
+    role = get_role_by_name("default", db_session)
+    if not role:
+        role = create_role("default", db_session)
 
-    user = db_session.query(User).filter(User.email == config.FIRST_SUPERUSER).first()
+    user = get_user_by_username(config.FIRST_SUPERUSER, db_session)
     if not user:
-        user = User(
-            email=config.FIRST_SUPERUSER,
-            password=pwd_context.hash(config.FIRST_SUPERUSER_PASSWORD),
-            group=group,
-            is_superuser=True,
-        )
-        user.groups_admin.append(group)
-
-        db_session.add(user)
-    db_session.commit()
+        user = create_user(db_session, config.FIRST_SUPERUSER, config.FIRST_SUPERUSER_PASSWORD, is_superuser=True)
+        assign_role_to_user(role, user, db_session)
