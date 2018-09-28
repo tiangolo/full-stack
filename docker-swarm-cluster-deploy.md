@@ -358,7 +358,7 @@ docker service create \
     -H "tcp://tasks.portainer_agent:9001" --tlsskipverify
 ```
 
-You will be able to securely access the web UI at `https://portainer.<your domain>` using the created username and password.
+You will be able to securely access the web UI at `https://portainer.<your domain>` where you will be able to create your username and password.
 
 This quick guide on Portainer is adapted from the [official documentation for Docker Swarm mode clusters](http://portainer.readthedocs.io/en/stable/agent.html), adding deployment restrictions to make sure the same volume and database is always used and to enable HTTPS via Traefik.
 
