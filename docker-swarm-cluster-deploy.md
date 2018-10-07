@@ -227,7 +227,7 @@ docker service create \
     --acme.httpChallenge.entryPoint=http\
     --acme.onhostrule=true \
     --acme.acmelogging=true \
-    --logLevel=DEBUG \
+    --logLevel=INFO \
     --accessLog \
     --api
 ```
@@ -268,7 +268,7 @@ The previous command explained:
 * `--acme.httpChallenge.entryPoint=http`: use HTTP for the ACME (Let's Encrypt HTTPS certificates) challenge, as HTTPS was disabled after a security issue
 * `--acme.onhostrule=true`: get new certificates automatically with host rules: "traefik.frontend.rule=Host:web.example.com"
 * `--acme.acmelogging=true`: log Let's encrypt activity - to debug when and if it gets certificates
-* `--logLevel=DEBUG`: log everything, to debug configurations and config reloads
+* `--logLevel=INFO`: default logging, if the frontend is not enough to debug configurations and hosts detected, or you want to see more of the logs, set it to `DEBUG`. Have in mind that after some time it might affect performance.
 * `--accessLog`: enable the access log, to see and debug HTTP traffic
 * `--api`: enable the API, which includes the dashboard
 
