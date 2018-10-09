@@ -449,7 +449,13 @@ If you use GitLab and want to integrate Continuous Integration / Continuous Depl
 There is a sub-section with how to install it in Docker Swarm mode and one in Docker standalone mode.
 
 
-### Create the GitLab Runner in Docker Swarm mode
+### (DEPRECATED) Create the GitLab Runner in Docker Swarm mode
+
+You probably want to run the GitLab runner in Docker standalone, even when you deploy it in a Docker Swarm mode Manager Node to deploy production stacks. To do that, follow the guide in the next section.
+
+**Technical details**: This is because the Runner configurations will persist in the created container after the registration. If you create the GitLab Runner as a Docker Swarm mode service, your Runner could be deployed to a different Docker Swarm mode Manager Node the next time, and then you would lose the registration configuration.
+
+---
 
 To install a GitLab runner in Docker Swarm mode run:
 
@@ -490,7 +496,7 @@ docker exec -it gitlab-ru
 
 ...and then hit `tab`.
 
-Complete the command with the [GitLab Runner registration setup](https://docs.gitlab.com/runner/register/index.html#docker), e.g.:
+Then add `bash` to the end, to start a Bash session inside the container, e.g.:
 
 ```bash
 docker exec -it gitlab-runner.1.eybbh93lasdfvvnasdfh7 bash
@@ -500,7 +506,9 @@ Continue below in the seciton **Install the GitLab Runner**.
 
 ### Create the GitLab Runner in Docker standalone mode
 
-You might want to run a GitLab runner in Docker standalone, for example, run the tests in a standalone server and deploy in a Docker Swarm mode cluster. 
+You probably want to run the GitLab runner in Docker standalone, even when you deploy it in a Docker Swarm mode Manager Node to deploy production stacks. 
+
+**Technical details**: This is because the Runner configurations will persist in the created container after the registration. If you create the GitLab Runner as a Docker Swarm mode service, your Runner could be deployed to a different Docker Swarm mode Manager Node the next time, and then you would lose the registration configuration.
 
 To install a GitLab runner in a standalone Docker run:
 
@@ -519,7 +527,7 @@ Then, enter into that container:
 docker exec -it gitlab-runner bash
 ```
 
-Continue below in the seciton **Install the GitLab Runner**.
+Continue below in the section **Install the GitLab Runner**.
 
 ### Install the GitLab Runner
 
