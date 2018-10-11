@@ -5,7 +5,8 @@ RUN pip install requests faker==0.8.4 pytest tenacity psycopg2-binary SQLAlchemy
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:
 # jupyter notebook --ip=0.0.0.0 --allow-root
-RUN pip install jupyter
+ARG env=prod
+RUN bash -c "if [ $env == 'dev' ] ; then pip install jupyter ; fi"
 EXPOSE 8888
 
 COPY ./app /app
