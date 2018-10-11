@@ -39,7 +39,7 @@ apt-get upgrade -y
 ```
 
 * Install Docker following the official guide: https://docs.docker.com/install/
-* Or alternatively, run the official convenience script, but have in mind that it would install the `edge` version:
+* Or alternatively, run the official convenience script:
 
 ```bash
 # Download Docker
@@ -115,7 +115,7 @@ docker swarm join --token SWMTKN-1-5tl7ya98erd9qtasdfml4lqbosbhfqv3asdf4p13-dzw6
 
 Set up a main load balancer with Traefik that handles the public connections and Let's encrypt HTTPS certificates. 
 
-* Connect to a manager node in your cluster (you might have only one node) that will have the Traefik service via SSH.
+* Connect via SSH to a manager node in your cluster (you might have only one node) that will have the Traefik service.
 * Create a network that will be shared with Traefik and the containers that should be accessible from the outside, with:
 
 ```bash
@@ -154,7 +154,7 @@ export USE_HOSTNAME=dog.example.com
 export USE_HOSTNAME=$HOSTNAME
 ```
 
-* You will access the Traefik dashboard at `traefik.<your hostname>`, e.g. `traefik.dog.example.com`. So, make sure that your DNS records point `traefik.<your hostname>` to one of the IPs of the cluster. Better if it is the IP where the Traefik service runs.
+* You will access the Traefik dashboard at `traefik.<your hostname>`, e.g. `traefik.dog.example.com`. So, make sure that your DNS records point `traefik.<your hostname>` to one of the IPs of the cluster. Better if it is the IP where the Traefik service runs (the manager node you are currently connected to).
 
 * Create an environment variable with a username (you will use it for the HTTP Basic Auth), for example:
 
@@ -192,7 +192,7 @@ It will look like:
 admin:$apr1$89eqM5Ro$CxaFELthUKV21DpI3UTQO.
 ```
 
-* Create a Traefik service:
+* Create a Traefik service, copy this long command in the terminal:
 
 ```bash
 docker service create \
@@ -246,7 +246,7 @@ The previous command explained:
 * `--network traefik-public`: listen to the specific network traefik-public
 * `--label "traefik.frontend.rule=Host:traefik.$USE_HOSTNAME"`: enable the Traefik API and dashboard in the host `traefik.$USE_HOSTNAME`, using the `$USE_HOSTNAME` environment variable created above
 * `--label "traefik.enable=true"`: make Traefik expose "itself" as a Docker service, this is what makes the Traefik dashboard available with HTTPS and basic auth
-* `--label "traefik.port=8080"`: when Traefik exposes itself as a service (for the dashboard), use the service port `8080`
+* `--label "traefik.port=8080"`: when Traefik exposes itself as a service (for the dashboard), use the internal service port `8080`
 * `--label "traefik.tags=traefik-public"`: as the service will only expose services with the `traefik-public` tag (using a parameter below), make the dashboard service have this tag too, so that the Traefik public (itself) can find it and expose it
 * `--label "traefik.docker.network=traefik-public"`: make the dashboard service use the `traefik-public` network to expose itself
 * `--label "traefik.redirectorservice.frontend.entryPoints=http"`: make the web dashboard listen to HTTP, so that it can redirect to HTTPS
@@ -268,7 +268,7 @@ The previous command explained:
 * `--acme.httpChallenge.entryPoint=http`: use HTTP for the ACME (Let's Encrypt HTTPS certificates) challenge, as HTTPS was disabled after a security issue
 * `--acme.onhostrule=true`: get new certificates automatically with host rules: "traefik.frontend.rule=Host:web.example.com"
 * `--acme.acmelogging=true`: log Let's encrypt activity - to debug when and if it gets certificates
-* `--logLevel=INFO`: default logging, if the frontend is not enough to debug configurations and hosts detected, or you want to see more of the logs, set it to `DEBUG`. Have in mind that after some time it might affect performance.
+* `--logLevel=INFO`: default logging, if the web UI is not enough to debug configurations and hosts detected, or you want to see more of the logs, set it to `DEBUG`. Have in mind that after some time it might affect performance.
 * `--accessLog`: enable the access log, to see and debug HTTP traffic
 * `--api`: enable the API, which includes the dashboard
 
