@@ -47,7 +47,7 @@ import { appName } from '@/env';
 export default class Login extends Vue {
   public email: string = '';
   public password: string = '';
-  appName = appName;
+  public appName = appName;
 
 
   public beforeRouteEnter(to, from, next) {

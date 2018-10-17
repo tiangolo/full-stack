@@ -56,26 +56,26 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component } from 'vue-property-decorator';
 
-import { appName } from "@/env";
+import { appName } from '@/env';
 import store, {
   setDashboardMiniDrawer,
   setDashboardShowDrawer,
-  actionLogOut
-} from "@/store";
+  actionLogOut,
+} from '@/store';
 
 @Component
 export default class Main extends Vue {
-  appName = appName;
+  public appName = appName;
 
-  miniVariant = false;
+  public miniVariant = false;
 
   public beforeRouteEnter(to, from, next) {
     if (store.state.isLoggedIn) {
       next();
     } else {
-      next("/");
+      next('/');
     }
   }
 
@@ -83,7 +83,7 @@ export default class Main extends Vue {
     if (store.state.isLoggedIn) {
       next();
     } else {
-      next("/");
+      next('/');
     }
   }
 
@@ -95,21 +95,21 @@ export default class Main extends Vue {
     this.$store.commit(setDashboardShowDrawer, value);
   }
 
-  switchShowDrawer() {
+  public switchShowDrawer() {
     this.$store.commit(
       setDashboardShowDrawer,
-      !this.$store.state.dashboardShowDrawer
+      !this.$store.state.dashboardShowDrawer,
     );
   }
 
-  switchMiniDrawer() {
+  public switchMiniDrawer() {
     this.$store.commit(
       setDashboardMiniDrawer,
-      !this.$store.state.dashboardMiniDrawer
+      !this.$store.state.dashboardMiniDrawer,
     );
   }
 
-  logout() {
+  public logout() {
     this.$store.dispatch(actionLogOut);
   }
 }

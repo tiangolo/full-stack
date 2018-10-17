@@ -25,7 +25,7 @@ import { actionCheckLoggedIn } from '@/store';
 @Component
 export default class App extends Vue {
 
-  created() {
+  public created() {
     this.$store.dispatch(actionCheckLoggedIn);
   }
 }
