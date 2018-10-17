@@ -9,6 +9,7 @@ default_context:
   secret_key: '{{ cookiecutter.secret_key }}'
   first_superuser: '{{ cookiecutter.first_superuser }}'
   first_superuser_password: '{{ cookiecutter.first_superuser_password }}'
+  backend_cors_origins: '{{ cookiecutter.backend_cors_origins }}'
   postgres_password: '{{ cookiecutter.postgres_password }}'
   pgadmin_default_user: '{{ cookiecutter.pgadmin_default_user }}'
   pgadmin_default_user_password: '{{ cookiecutter.pgadmin_default_user_password }}'
