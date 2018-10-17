@@ -18,6 +18,7 @@ if not SECRET_KEY:
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 8  # 60 minutes * 24 hours * 8 days
 
 SERVER_NAME = os.getenv("SERVER_NAME")
+BACKEND_CORS_ORIGINS = os.getenv("BACKEND_CORS_ORIGINS")
 SENTRY_DSN = os.getenv("SENTRY_DSN")
 
 POSTGRES_SERVER = os.getenv("POSTGRES_SERVER")

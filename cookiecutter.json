@@ -11,6 +11,7 @@
     "secret_key": "changethis",
     "first_superuser": "admin@{{cookiecutter.domain_main}}",
     "first_superuser_password": "changethis",
+    "backend_cors_origins": "http://{{cookiecutter.domain_dev}}, http://{{cookiecutter.domain_dev}}:4200, http://{{cookiecutter.domain_dev}}:3000, http://{{cookiecutter.domain_dev}}:8080, https://{{cookiecutter.domain_staging}}, https://{{cookiecutter.domain_main}}",
     
 
     "postgres_password": "changethis",
@@ -34,6 +35,7 @@
 
     "_copy_without_render": [
         "frontend/src/**/*.html",
+        "frontend/src/**/*.vue",
         "frontend/node_modules/*"
     ]
 }

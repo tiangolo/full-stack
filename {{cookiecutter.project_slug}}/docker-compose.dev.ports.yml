@@ -6,7 +6,7 @@ services:
   proxy:
     ports:
       - '80:80'
-      - '8080:8080'
+      - '8090:8080'
   flower:
     ports:
       - '5555:5555'
