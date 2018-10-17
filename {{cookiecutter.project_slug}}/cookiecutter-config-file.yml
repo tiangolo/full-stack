@@ -25,5 +25,6 @@ default_context:
   docker_image_frontend: '{{ cookiecutter.docker_image_frontend }}'
   _copy_without_render:
     - frontend/src/**/*.html
+    - frontend/src/**/*.vue
     - frontend/node_modules/*
   _template: ./
