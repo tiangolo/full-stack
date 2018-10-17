@@ -49,7 +49,6 @@ export default class Login extends Vue {
   public password: string = '';
   public appName = appName;
 
-
   public beforeRouteEnter(to, from, next) {
     if (store.state.isLoggedIn === false) {
       next();
