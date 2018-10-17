@@ -11,14 +11,17 @@ COPY ./ /app/
 
 ARG FRONTEND_ENV=production
 
-RUN npm run test:prod
+ENV VUE_APP_ENV=${FRONTEND_ENV}
 
-RUN npm run build -- --output-path=./dist/out --configuration $FRONTEND_ENV
+# Comment out the next line to disable tests
+RUN npm run test:unit
+
+RUN npm run build
 
 
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
 FROM nginx:1.15
 
-COPY --from=build-stage /app/dist/out/ /usr/share/nginx/html
+COPY --from=build-stage /app/dist/ /usr/share/nginx/html
 
 COPY --from=build-stage /nginx.conf /etc/nginx/conf.d/default.conf

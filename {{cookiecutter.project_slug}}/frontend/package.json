@@ -1,60 +1,71 @@
 {
   "name": "frontend",
-  "version": "0.0.0",
-  "license": "MIT",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "start:dev": "ng serve --sourcemaps=true --environment=dev  --host={{cookiecutter.domain_dev}}",
-    "start:stag": "ng serve --sourcemaps=true --environment=stag --host={{cookiecutter.domain_dev}}",
-    "start:prod": "ng serve --sourcemaps=true --environment=prod --host={{cookiecutter.domain_dev}}",
-    "build": "ng build",
-    "build:dev": "ng build --prod --environment=dev",
-    "build:stag": "ng build --prod --environment=stag",
-    "build:prod": "ng build --prod --environment=prod",
-    "test": "ng test",
-    "test:dev": "ng test --sourcemaps=false --code-coverage=true --environment=dev  --browsers Chrome",
-    "test:stag": "ng test --sourcemaps=false --code-coverage=true --environment=stag --browsers Chrome",
-    "test:prod": "ng test --sourcemaps=false --code-coverage=true --environment=prod --browsers ChromeHeadlessNoSandbox --single-run",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
-  },
+  "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "test:unit": "vue-cli-service test:unit"
+  },
   "dependencies": {
-    "@angular/animations": "^5.1.2",
-    "@angular/common": "^5.1.2",
-    "@angular/compiler": "^5.1.2",
-    "@angular/core": "^5.1.2",
-    "@angular/forms": "^5.1.2",
-    "@angular/http": "^5.0.0",
-    "@angular/platform-browser": "^5.1.2",
-    "@angular/platform-browser-dynamic": "^5.1.2",
-    "@angular/router": "^5.1.2",
-    "core-js": "^2.4.1",
-    "rxjs": "^5.5.2",
-    "zone.js": "^0.8.14"
+    "@babel/polyfill": "^7.0.0-rc.1",
+    "axios": "^0.18.0",
+    "register-service-worker": "^1.0.0",
+    "vue": "^2.5.17",
+    "vue-class-component": "^6.0.0",
+    "vue-property-decorator": "^7.0.0",
+    "vue-router": "^3.0.1",
+    "vuetify": "^1.2.0",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@angular/cli": "^1.6.3",
-    "@angular/compiler-cli": "^5.1.2",
-    "@angular/language-service": "^5.1.2",
-    "@types/jasmine": "~2.5.53",
-    "@types/jasminewd2": "~2.0.2",
-    "@types/node": "~6.0.60",
-    "codelyzer": "^4.0.1",
-    "jasmine-core": "~2.6.2",
-    "jasmine-spec-reporter": "~4.1.0",
-    "karma": "~1.7.0",
-    "karma-chrome-launcher": "~2.1.1",
-    "karma-cli": "~1.0.1",
-    "karma-coverage-istanbul-reporter": "^1.2.1",
-    "karma-jasmine": "~1.1.0",
-    "karma-jasmine-html-reporter": "^0.2.2",
-    "karma-mocha-reporter": "^2.2.5",
-    "protractor": "~5.1.2",
-    "puppeteer": "^0.11.0",
-    "ts-node": "~3.2.0",
-    "tslint": "~5.7.0",
-    "typescript": "~2.5.3"
+    "@types/jest": "^23.1.4",
+    "@vue/cli-plugin-babel": "^3.0.4",
+    "@vue/cli-plugin-pwa": "^3.0.4",
+    "@vue/cli-plugin-typescript": "^3.0.4",
+    "@vue/cli-plugin-unit-jest": "^3.0.4",
+    "@vue/cli-service": "^3.0.4",
+    "@vue/test-utils": "^1.0.0-beta.20",
+    "babel-core": "7.0.0-bridge.0",
+    "ts-jest": "^23.0.0",
+    "typescript": "^3.0.0",
+    "vue-cli-plugin-vuetify": "^0.2.1",
+    "vue-template-compiler": "^2.5.17"
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 10"
+  ],
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "json",
+      "vue",
+      "ts",
+      "tsx"
+    ],
+    "transform": {
+      "^.+\\.vue$": "vue-jest",
+      ".+\\.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$": "jest-transform-stub",
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "snapshotSerializers": [
+      "jest-serializer-vue"
+    ],
+    "testMatch": [
+      "**/tests/unit/**/*.spec.(js|jsx|ts|tsx)|**/__tests__/*.(js|jsx|ts|tsx)"
+    ],
+    "testURL": "http://localhost/"
   }
 }
