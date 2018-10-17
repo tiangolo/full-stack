@@ -1,32 +1,26 @@
 <template>
   <div>
-    <v-btn @click="trigger" color="success">{{title}}</v-btn>
-    <input class="visually-hidden" type="file" v-on:change="fileSelected" ref="fileInput">
+    <v-btn :color="color" @click="trigger"><slot>Choose File</slot></v-btn>
+    <input :multiple="multiple" class="visually-hidden" type="file" v-on:change="files" ref="fileInput">
   </div>
 </template>
 
-<script>
-  export default {
-    name: 'upload-button',
-    props: {
-      selectedCallback: Function,
-      title: String
-    },
-    methods: {
-      fileSelected(e) {
-        if (this.selectedCallback) {
-          if (e.target.files[0]) {
-            this.selectedCallback(e.target.files[0]);
-          } else {
-            this.selectedCallback(null);
-          }
-        }
-      },
-      trigger() {
-        this.$refs.fileInput.click();
-      }
-    }
+<script lang="ts">
+import { Component, Vue, Prop, Emit } from 'vue-property-decorator';
+
+@Component
+export default class UploadButton extends Vue {
+  @Prop(String) public color: string | undefined;
+  @Prop({default: false}) public multiple!: boolean;
+  @Emit()
+  public files(e): FileList {
+    return e.target.files;
   }
+
+  public trigger() {
+    (this.$refs.fileInput as HTMLElement).click();
+  }
+}
 </script>
 
 <style scoped>
