@@ -25,10 +25,19 @@ Generate a backend and frontend stack using Python, including interactive API do
 * Celery worker that can import and use models and code from the rest of the backend selectively (you don't have to install the complete app in each worker)
 * REST backend tests based on Pytest, integrated with Docker, so you can test the full API interaction, independent on the database. As it runs in Docker, it can build a new data store from scratch each time (so you can use ElasticSearch, MongoDB, CouchDB, or whatever you want, and just test that the API works)
 * Easy Python integration with Jupyter Kernels for remote or in-Docker development with extensions like Atom Hydrogen or Visual Studio Code Jupyter
-* Angular frontend with:
-  * Docker server based on Nginx
+* Vue frontend:
+  * Generated with Vue CLI
+  * JWT Authentication handling
+  * Login view
+  * After login, main dashboard view
+  * Vuex
+  * Vue-router
+  * Vuetify for beautiful material design components
+  * TypeScript
+  * Docker server based on Nginx (configured to play nicely with Vue-router)
   * Docker multi-stage building, so you don't need to save or commit compiled code
-  * Docker building integrated tests with Chrome Headless
+  * Frontend tests ran at build time (can be disabled too)
+  * Made as modular as possible, so it works out of the box, but you can re-generate with Vue CLI or create it as you need, and re-use what you want
 * PGAdmin for PostgreSQL database, you can modify it to use PHPMyAdmin and MySQL easily
 * Swagger-UI for live interactive documentation
 * Flower for Celery jobs monitoring
@@ -67,15 +76,15 @@ The input variables, with their default values (some auto generated) are:
 * `project_slug`: The development friendly name of the project. By default, based on the project name
 * `domain_main`: The domain in where to deploy the project for production (from the branch `production`), used by the load balancer, backend, etc. By default, based on the project slug.
 * `domain_staging`: The domain in where to deploy while staging (before production) (from the branch `master`). By default, based on the main domain.
-* `domain_branch`: The domain in where to deploy the project while on another branch, probably a feature branch. By default, based on the main domain.
 * `domain_dev`: The domain to use while developing. It won't be deployed, but you should use it by modifying your local `hosts` file.
 
 * `docker_swarm_stack_name_main`: The name of the stack while deploying to Docker in Swarm mode for production. By default, based on the domain.
 * `docker_swarm_stack_name_staging`: The name of the stack while deploying to Docker in Swarm mode for staging. By default, based on the domain.
-* `docker_swarm_stack_name_branch`: The name of the stack while deploying to Docker in Swarm mode for feature branches. By default, based on the domain.
+
 * `secret_key`: Backend server secret key. Use the method above to generate it.
 * `first_superuser`: The first superuser generated, with it you will be able to create more users, etc. By default, based on the domain.
 * `first_superuser_password`: First superuser password. Use the method above to generate it.
+* `backend_cors_origins`: Origins (domains, more or less) that are enabled for CORS (Cross Origin Resource Sharing). This allows a frontend in one domain (e.g. `https://dashboard.example.com`) to communicate with this backend, that could be living in another domain (e.g. `https://api.example.com`). It can also be used to allow your local frontend (with a custom `hosts` domain mapping, as described in the project's `README.md`) that could be living in `http://dev.example.com:8080` to cummunicate with the backend at `https://stag.example.com`. Notice the `http` vs `https` and the `dev.` prefix for local development vs the "staging" `stag.` prefix. By default, it includes origins for production, staging and development, with ports commonly used during local development by several popular frontend frameworks (Vue with `:8080`, React, Angular).
  
 * `postgres_password`: Postgres database password. Use the method above to generate it. (You could easily modify it to use MySQL, MariaDB, etc).
 * `pgadmin_default_user`: PGAdmin default user, to log-in to the PGAdmin interface.
@@ -83,8 +92,6 @@ The input variables, with their default values (some auto generated) are:
  
 * `traefik_constraint_tag`: The tag to be used by the internal Traefik load balancer (for example, to divide requests between backend and frontend) for production. Used to separate this stack from any other stack you might have. This should identify each stack in each environment (production, staging, etc).
 * `traefik_constraint_tag_staging`: The Traefik tag to be used while on staging. 
-* `traefik_constraint_tag_branch`: The Traefik tag to be used while on a feature branch.
-
 * `traefik_public_network`: This assumes you have another separate publicly facing Traefik at the server / cluster level. This is the network that main Traefik lives in.
 * `traefik_public_constraint_tag`: The tag that should be used by stack services that should communicate with the public.
 
@@ -105,9 +112,11 @@ Read the [**Guide to deploy a Docker Swarm Mode Cluster**](docker-swarm-cluster-
 
 ## More details
 
-After using this generator, the new project will contain an extensive `README.md` with instructions for development, deployment, etc. You can read [the project `README.md` template here](./{{cookiecutter.project_slug}}/README.md).
+After using this generator, your new project (the directory created) will contain an extensive `README.md` with instructions for development, deployment, etc. You can pre-read [the project `README.md` template here too](./{{cookiecutter.project_slug}}/README.md).
 
 ## History
+
+**Note about Angular**: a previous version of this project generated a basic default Angular frontend application, but without any view or interaction with the rest of the stack (the backend API). I recently switched to Vue for frontend and used it to created the basic frontend views for this project (that didn't exist before). If you are interested in keeping the Angular version, let me know in an issue, I can create an Angular version of the project (without the current default views), then you can integrate your Angular app with the basic `Dockerfile` and additional files.
 
 This project was based on [senseta-os/senseta-base-project](https://github.com/senseta-os/senseta-base-project).
 

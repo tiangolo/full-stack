@@ -4,15 +4,25 @@
 
 * Update your local `hosts` file, set the IP `127.0.0.1` (your `localhost`) to `{{cookiecutter.domain_dev}}`. The `docker-compose.dev.env.yml` file(that will be one of the Docker Compose files used by default) will set the environment variable `SERVER_NAME` to that host. Otherwise you would receive 404 HTTP errors and "Cross Origin Resource Sharing" (CORS) errors.
 
-* Modify your hosts file, for macOS and Linux, probably in `/etc/hosts`. For Windows, in `c:\Windows\System32\Drivers\etc\hosts` to include:
+* Modify your `hosts` file, for macOS and Linux, probably in `/etc/hosts`. For Windows, in . Make sure you open it with administrative privileges.
+
+**Note for Windows**: If you are in Windows, open the main Windows menu, search for "notepad", right click it, and select the option "open as Administrator" or similar. Then click the "File" menu, "Open file" and open the file at `c:\Windows\System32\Drivers\etc\hosts`.
+
+Make sure the `hosts` file contains (additionally to whatever it has):
 
 ```
-0.0.0.0    {{cookiecutter.domain_dev}}
+127.0.0.1    {{cookiecutter.domain_dev}}
 ```
 
-...that will make your browser talk to your locally running server when it is asked to go to `{{cookiecutter.domain_dev}}` and think that it is a remote server while it is actually running locally.
+...that will make your browser talk to your locally running server when it is asked to go to `{{cookiecutter.domain_dev}}` and think that it is a remote server while it is actually running in your computer.
 
-Make sure you open the `hosts` file with administrator privileges to be able to change it. And save it as is, without extensions (Windows tends to try to automatically add `.txt` extensions).
+**Note for Windows and Mac**: If you are on Windows or Mac, and your Docker is running on a virtual machine (like with Docker Toolbox), you should put the IP of the virtual machine. For example:
+
+```
+192.168.99.100    {{cookiecutter.domain_dev}}
+```
+
+Make sure you save the file as is, without extensions (Windows tends to try to automatically add `.txt` extensions).
 
 * Start the stack with Docker Compose:
 
@@ -32,7 +42,7 @@ PGAdmin, PostgreSQL web administration: http://{{cookiecutter.domain_dev}}:5050
 
 Flower, administration of Celery tasks: http://{{cookiecutter.domain_dev}}:5555
 
-Traefik UI, to see how the routes are being handled by the proxy: http://{{cookiecutter.domain_dev}}:8080
+Traefik UI, to see how the routes are being handled by the proxy: http://{{cookiecutter.domain_dev}}:8090
 
 
 ## Backend local development, additional details
@@ -200,15 +210,21 @@ If you don't want to start with the default models and want to remove them / mod
 
 ## Frontend development
 
-* Enter the `frontend` directory, install the NPM packages and start it the `npm` scrits:
+* Enter the `frontend` directory, install the NPM packages and start the live server using the `npm` scripts:
 
 ```bash
 cd frontend
 npm install
-npm run start
+npm run serve
 ```
 
+Then open your browser at http://{{cookiecutter.domain_dev}}:8080
+
+Notice that this live server is not running inside Docker, it is for local development, and that is the recommended workflow. Once you are happy with your frontend, you can build the frontend Docker image and start it, to test it in a production-like environment. But compiling the image at every change will not be as productive as running the local development server.
+
 Check the file `package.json` to see other available options.
+
+If you have Vue CLI installed, you can also run `vue ui` to control, configure, serve and analyse your application using a nice local web user interface.
 
 ## Deployment
 
@@ -459,36 +475,10 @@ PGAdmin: http://{{cookiecutter.domain_dev}}:5050
 
 Flower: http://{{cookiecutter.domain_dev}}:5555
 
-Traefik UI: http://{{cookiecutter.domain_dev}}:8080
-
-## Project Cookiecutter variables used during generation
-
-* `project_name`: {{cookiecutter.project_name}}
-* `project_slug`: {{cookiecutter.project_slug}}
-* `domain_main`: {{cookiecutter.domain_main}}
-* `domain_staging`: {{cookiecutter.domain_staging}}
-* `domain_dev`: {{cookiecutter.domain_dev}}
-* `docker_swarm_stack_name_main`: {{cookiecutter.docker_swarm_stack_name_main}}
-* `docker_swarm_stack_name_staging`: {{cookiecutter.docker_swarm_stack_name_staging}}
-* `secret_key`: {{cookiecutter.secret_key}}
-* `first_superuser`: {{cookiecutter.first_superuser}}
-* `first_superuser_password`: {{cookiecutter.first_superuser_password}}
-* `postgres_password`: {{cookiecutter.postgres_password}}
-* `pgadmin_default_user`: {{cookiecutter.pgadmin_default_user}}
-* `pgadmin_default_user_password`: {{cookiecutter.pgadmin_default_user_password}}
-* `traefik_constraint_tag`: {{cookiecutter.traefik_constraint_tag}}
-* `traefik_constraint_tag_staging`: {{cookiecutter.traefik_constraint_tag_staging}}
-* `traefik_public_network`: {{cookiecutter.traefik_public_network}}
-* `traefik_public_constraint_tag`: {{cookiecutter.traefik_public_constraint_tag}}
-* `flower_auth`: {{cookiecutter.flower_auth}}
-* `sentry_dsn`: {{cookiecutter.sentry_dsn}}
-* `docker_image_prefix`: {{cookiecutter.docker_image_prefix}}
-* `docker_image_backend`: {{cookiecutter.docker_image_backend}}
-* `docker_image_celeryworker`: {{cookiecutter.docker_image_celeryworker}}
-* `docker_image_frontend`: {{cookiecutter.docker_image_frontend}}
+Traefik UI: http://{{cookiecutter.domain_dev}}:8090
 
 
-## Updating, re-generating
+## Project generation and updating, or re-generating
 
 This project was generated using https://github.com/tiangolo/full-stack with:
 
@@ -497,13 +487,15 @@ pip install cookiecutter
 cookiecutter https://github.com/tiangolo/full-stack
 ```
 
+You can check the variables used during generation in the file `cookiecutter-config-file.yml`.
+
 You can generate the project again with the same configurations used the first time.
 
 That would be useful if, for example, the project generator (`tiangolo/full-stack`) was updated and you want to integrate or review the changes.
 
-You could generate a new project with the same configurations as this one in a parallel directory. And compare the differences between the two, without having to overwrite your current code and being able to use your current variables.
+You could generate a new project with the same configurations as this one in a parallel directory. And compare the differences between the two, without having to overwrite your current code but being able to use the same variables used for your current project.
 
-To achieve that, the generated project includes a file `cookiecutter-config-file.yml` with the current variables used.
+To achieve that, the generated project includes the file `cookiecutter-config-file.yml` with the current variables used.
 
 You can use that file while generating a new project to reuse all those variables.
 
