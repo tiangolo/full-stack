@@ -20,7 +20,7 @@ tests:
 build-stag:
   stage: build
   script:
-    - TAG=stag FRONTEND_ENV=stag sh ./script-build-push.sh
+    - TAG=stag FRONTEND_ENV=staging sh ./script-build-push.sh
   only:
     - master
   tags:
@@ -30,7 +30,7 @@ build-stag:
 build-prod:
   stage: build
   script:
-    - TAG=prod sh ./script-build-push.sh
+    - TAG=prod FRONTEND_ENV=production sh ./script-build-push.sh
   only:
     - production
   tags:
