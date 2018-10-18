@@ -1,28 +1,15 @@
 # {{cookiecutter.project_name}}
 
-## Backend local development, first steps
+## Backend Requirements
 
-* Update your local `hosts` file, set the IP `127.0.0.1` (your `localhost`) to `{{cookiecutter.domain_dev}}`. The `docker-compose.dev.env.yml` file(that will be one of the Docker Compose files used by default) will set the environment variable `SERVER_NAME` to that host. Otherwise you would receive 404 HTTP errors and "Cross Origin Resource Sharing" (CORS) errors.
+* Docker
+* Docker Compose
 
-* Modify your `hosts` file, for macOS and Linux, probably in `/etc/hosts`. For Windows, in . Make sure you open it with administrative privileges.
+## Frontend Requirements
 
-**Note for Windows**: If you are in Windows, open the main Windows menu, search for "notepad", right click it, and select the option "open as Administrator" or similar. Then click the "File" menu, "Open file" and open the file at `c:\Windows\System32\Drivers\etc\hosts`.
+* Node.js (with `npm`)
 
-Make sure the `hosts` file contains (additionally to whatever it has):
-
-```
-127.0.0.1    {{cookiecutter.domain_dev}}
-```
-
-...that will make your browser talk to your locally running server when it is asked to go to `{{cookiecutter.domain_dev}}` and think that it is a remote server while it is actually running in your computer.
-
-**Note for Windows and Mac**: If you are on Windows or Mac, and your Docker is running on a virtual machine (like with Docker Toolbox), you should put the IP of the virtual machine. For example:
-
-```
-192.168.99.100    {{cookiecutter.domain_dev}}
-```
-
-Make sure you save the file as is, without extensions (Windows tends to try to automatically add `.txt` extensions).
+## Backend local development
 
 * Start the stack with Docker Compose:
 
@@ -32,24 +19,39 @@ docker-compose up -d
 
 * Now you can open your browser and interact with these URLs:
 
-Frontend, built with Docker, with routes handled based on the path: http://{{cookiecutter.domain_dev}}
+Frontend, built with Docker, with routes handled based on the path: http://localhost
 
-Backend, JSON based web API, with Swagger automatic documentation: http://{{cookiecutter.domain_dev}}/api/
+Backend, JSON based web API, with Swagger automatic documentation: http://localhost/api/
 
-Swagger UI, frontend user interface to interact with the API live: http://{{cookiecutter.domain_dev}}/swagger/
+Swagger UI, frontend user interface to interact with the API live: http://localhost/swagger/
 
-PGAdmin, PostgreSQL web administration: http://{{cookiecutter.domain_dev}}:5050
+PGAdmin, PostgreSQL web administration: http://localhost:5050
 
-Flower, administration of Celery tasks: http://{{cookiecutter.domain_dev}}:5555
+Flower, administration of Celery tasks: http://localhost:5555
 
-Traefik UI, to see how the routes are being handled by the proxy: http://{{cookiecutter.domain_dev}}:8090
+Traefik UI, to see how the routes are being handled by the proxy: http://localhost:8090
 
+**Note**: The first time you start your stack, it might take a minute for it to be ready. While the backend waits for the database to be ready and configures everything. You can check the logs to monitor it.
+
+To check the logs, run:
+
+```bash
+docker-compose logs
+```
+
+To check the logs of a specific service, add the name of the service, e.g.:
+
+```bash
+docker-compose logs backend
+```
+
+If your Docker is not running in `localhost` (the URLs above wouldn't work) check the sections below on **Development with Docker Toolbox** and **Development with a custom IP**.
 
 ## Backend local development, additional details
 
 ### General workflow
 
-Add and modify SQLAlchemy models to `./backend/app/app/models/`, Marshmallow schemas to `./backend/app/app/schemas` and API endpoints to `./backend/app/app/api/`.
+Add and modify SQLAlchemy models in `./backend/app/app/models/`, Marshmallow schemas in `./backend/app/app/schemas` and API endpoints in `./backend/app/app/api/`.
 
 Add and modify tasks to the Celery worker in `./backend/app/app/worker.py`. 
 
@@ -107,6 +109,22 @@ Nevertheless, if it doesn't detect a change but a syntax error, it will just sto
 
 The Celery worker has a `$RUN` variable too, running the Celery worker, so that you can test it while being inside the container and debug errors, etc.
 
+### Backend tests
+
+To test the backend run:
+
+```bash
+DOMAIN=backend sh ./script-test.sh
+```
+
+The file `./script-test.sh` has the commands to generate a testing `docker-stack.yml` file from the needed Docker Compose files, start the stack and test it.
+
+The tests run with Pytest, modify and add tests to `./backend/app/app/tests/`.
+
+If you need to install any additional package for the tests, add it to the file `./backend/app/tests.dockerfile`.
+
+If you use GitLab CI the tests will automatically.
+
 ### Live development with Python Jupyter Notebooks
 
 If you know about Python [Jupyter Notebooks](http://jupyter.org/), you can take advantage of them during local development.
@@ -138,7 +156,7 @@ root@73e0ec1f1ae6:/app# $JUPYTER
         http://(73e0ec1f1ae6 or 127.0.0.1):8888/?token=f20939a41524d021fbfc62b31be8ea4dd9232913476f4397
 ```
 
-you can copy that URL and modify the "host" to be `localhost` or `{{cookiecutter.domain_dev}}`, in the case above, it would be, e.g.:
+you can copy that URL and modify the "host" to be `localhost` or the domain you are using for development (e.g. `local.dockertoolbox.tiangolo.com`), in the case above, it would be, e.g.:
 
 ```
 http://localhost:8888/token=f20939a41524d021fbfc62b31be8ea4dd9232913476f4397
@@ -151,26 +169,9 @@ You will have a full Jupyter Notebook running inside your container, that has di
 If you use tools like [Hydrogen](https://github.com/nteract/hydrogen) or [Visual Studio Code Jupyter](https://donjayamanne.github.io/pythonVSCodeDocs/docs/jupyter/), you can use that same modified URL.
 
 
-### Backend tests
-
-To test the backend run:
-
-```bash
-DOMAIN=backend sh ./script-test.sh
-```
-
-The file `./script-test.sh` has the commands to generate a testing `docker-stack.yml` file from the needed Docker Compose files, start the stack and test it.
-
-The tests run with Pytest, modify and add tests to `./backend/app/app/tests/`.
-
-If you need to install any additional package for the tests, add it to the file `./backend/app/tests.dockerfile`.
-
-If you use GitLab CI the tests will automaticall.dockerfiley.
-
-
 ### Migrations
 
-As in local development your app directory is mounted as a volume inside the container (set in the file `docker-compose.dev.volumes.yml`), you can also run the migrations with `alembic` commands inside the container and the migration code will be in your app directory (instead of being only inside the container). So you can add it to your git repository.
+As during local development your app directory is mounted as a volume inside the container (set in the file `docker-compose.dev.volumes.yml`), you can also run the migrations with `alembic` commands inside the container and the migration code will be in your app directory (instead of being only inside the container). So you can add it to your git repository.
 
 Make sure you create a "revision" of your models and that you "upgrade" your database with that revision every time you change them. As this is what will update the tables in your database. Otherwise, your application will have errors.
 
@@ -208,6 +209,109 @@ alembic upgrade head
 
 If you don't want to start with the default models and want to remove them / modify them, from the beginning, without having any previous revision, you can remove the revision files (`.py` Python files) under `./backend/app/alembic/versions/`. And then create a first migration as described above.
 
+### Development with Docker Toolbox
+
+If you are using **Docker Toolbox** in Windows or macOS instead of **Docker for Windows** or **Docker for Mac**, Docker will be running in a VirtualBox Virtual Machine, and it will have a local IP different than `127.0.0.1`, which is the IP address for `localhost` in your machine.
+
+The address of your Docker Toolbox virtual machine would probably be `192.168.99.100` (that is the default).
+
+As this is a common case, the domain `local.dockertoolbox.tiangolo.com` points to that (private) IP, just to help with development. That way, you can start the stack in Docker Toolbox, and use that domain for development. You will be able to open that URL in Chrome and it will communicate with your local Docker Toolbox directly as if it was a cloud server, including CORS (Cross Origin Resource Sharing).
+
+To use it, you need to tell your backend that it is running on that domain, you will have to edit a couple files.
+
+* Open the file located at `./.env`. It would have 2 lines like:
+
+```
+DOMAIN=localhost
+# DOMAIN=local.dockertoolbox.tiangolo.com
+```
+
+* Switch the comment, change the section to:
+
+```
+# DOMAIN=localhost
+DOMAIN=local.dockertoolbox.tiangolo.com
+```
+
+That variable will be used by the `docker-compose.dev.env.yml` file. That's one of the Docker Compose files used by default. It will set the environment variable `SERVER_NAME` to that host. Without that change, you would receive 404 HTTP errors and "Cross Origin Resource Sharing" (CORS) errors.
+
+* Now open the file located at `./frontend/.env`. It would have a line like:
+
+```
+VUE_APP_DOMAIN_DEV=localhost
+# VUE_APP_DOMAIN_DEV=local.dockertoolbox.tiangolo.com
+```
+
+* Change that line to:
+
+```
+# VUE_APP_DOMAIN_DEV=localhost
+VUE_APP_DOMAIN_DEV=local.dockertoolbox.tiangolo.com
+```
+
+That variable will make your frontend communicate with that domain when interacting with the API, when the other variable `VUE_APP_ENV` is set to `development`.
+
+Now you can open: http://local.dockertoolbox.tiangolo.com and it will be server by your Docker Toolbox.
+
+Check all the corresponding available URLs in the section at the end.
+
+### Development with a custom IP
+
+If you are running Docker in an IP address different than `127.0.0.1` (`localhost`) and `192.168.99.100` (the default of Docker Toolbox), you will need to perform some additional steps. That will be the case if you are running a custom Virtual Machine, a secondary Docker Toolbox or your Docker is located in a different machine in your network.
+
+In that case, you will need to use a fake local domain (`dev.{{cookiecutter.domain_main}}`) and make your computer think that the domain is is served by the custom IP (e.g. `192.168.99.150`).
+
+* Open your `hosts` file with administrative privileges using a text editor:
+  * **Note for Windows**: If you are in Windows, open the main Windows menu, search for "notepad", right click on it, and select the option "open as Administrator" or similar. Then click the "File" menu, "Open file", go to the directory `c:\Windows\System32\Drivers\etc\`, select the option to show "All files" instead of only "Text (.txt) files", and open the `hosts` file.
+  * **Note for Mac and Linux**: Your `hosts` file is probably located at `/etc/hosts`, you can edit it in a terminal running `sudo nano /etc/hosts`.
+
+* Additional to the contents it might have, add a new line with the custom IP (e.g. `192.168.99.150`) a space character, and your fake local domain: `dev.{{cookiecutter.domain_main}}`.
+
+The new line might look like:
+
+```
+192.168.99.100    dev.{{cookiecutter.domain_main}}
+```
+
+* Save the file.
+  * **Note for Windows**: Make sure you save the file as "All files", without an extension of `.txt`. By default, Windows tries to add the extension. Make sure the file is saved as is, without extension.
+
+...that will make your computer think that the fake local domain is served by that custom IP, and when you open that URL in your browser, it will talk directly to your locally running server when it is asked to go to `dev.{{cookiecutter.domain_main}}` and think that it is a remote server while it is actually running in your computer.
+
+Now you need to make sure the stack uses that domain.
+
+* Open the file located at `./.env`. It would have a line like:
+
+```
+DOMAIN=localhost
+```
+
+* Change that line to:
+
+```
+DOMAIN=dev.{{cookiecutter.domain_main}}
+```
+
+That variable will be used by the `docker-compose.dev.env.yml` file. That's one of the Docker Compose files used by default. It will set the environment variable `SERVER_NAME` to that host. Without that change, you would receive 404 HTTP errors and "Cross Origin Resource Sharing" (CORS) errors.
+
+* Now open the file located at `./frontend/.env`. It would have a line like:
+
+```
+VUE_APP_DOMAIN_DEV=localhost
+```
+
+* Change that line to:
+
+```
+VUE_APP_DOMAIN_DEV=dev.{{cookiecutter.domain_main}}
+```
+
+That variable will make your frontend communicate with that domain when interacting with the API, when the other variable `VUE_APP_ENV` is set to `development`.
+
+Now you can open: http://dev.{{cookiecutter.domain_main}} and it will be server by your Docker Toolbox.
+
+Check all the corresponding available URLs in the section at the end.
+
 ## Frontend development
 
 * Enter the `frontend` directory, install the NPM packages and start the live server using the `npm` scripts:
@@ -218,13 +322,29 @@ npm install
 npm run serve
 ```
 
-Then open your browser at http://{{cookiecutter.domain_dev}}:8080
+Then open your browser at http://localhost:8080
 
 Notice that this live server is not running inside Docker, it is for local development, and that is the recommended workflow. Once you are happy with your frontend, you can build the frontend Docker image and start it, to test it in a production-like environment. But compiling the image at every change will not be as productive as running the local development server.
 
 Check the file `package.json` to see other available options.
 
 If you have Vue CLI installed, you can also run `vue ui` to control, configure, serve and analyse your application using a nice local web user interface.
+
+If you are only developing the frontend (e.g. other team members are developing the backend) and there is a staging environment already deployed, you can make your local development code use that staging API instead of a full local Docker Compose stack.
+
+To do that, modify the file `./frontend/.env`, there's a section with:
+
+```
+VUE_APP_ENV=development
+# VUE_APP_ENV=staging
+```
+
+* Switch the comment, to:
+
+```
+# VUE_APP_ENV=development
+VUE_APP_ENV=staging
+```
 
 ## Deployment
 
@@ -463,19 +583,51 @@ Flower: https://flower.{{cookiecutter.domain_staging}}
     
 ### Development
 
-Development URLs, for local development. Given that you modified your `hosts` file.
+Development URLs, for local development.
 
-Frontend: http://{{cookiecutter.domain_dev}}
+Frontend: http://localhost
 
-Brontend: http://{{cookiecutter.domain_dev}}/api/
+Backend: http://localhost/api/
 
-Swagger UI: http://{{cookiecutter.domain_dev}}/swagger/
+Swagger UI: http://localhost/swagger/
 
-PGAdmin: http://{{cookiecutter.domain_dev}}:5050
+PGAdmin: http://localhost:5050
 
-Flower: http://{{cookiecutter.domain_dev}}:5555
+Flower: http://localhost:5555
 
-Traefik UI: http://{{cookiecutter.domain_dev}}:8090
+Traefik UI: http://localhost:8090
+
+### Development with Docker Toolbox
+
+Development URLs, for local development.
+
+Frontend: http://local.dockertoolbox.tiangolo.com
+
+Backend: http://local.dockertoolbox.tiangolo.com/api/
+
+Swagger UI: http://local.dockertoolbox.tiangolo.com/swagger/
+
+PGAdmin: http://local.dockertoolbox.tiangolo.com:5050
+
+Flower: http://local.dockertoolbox.tiangolo.com:5555
+
+Traefik UI: http://local.dockertoolbox.tiangolo.com:8090
+
+### Development with a custom IP
+
+Development URLs, for local development.
+
+Frontend: http://dev.{{cookiecutter.domain_main}}
+
+Backend: http://dev.{{cookiecutter.domain_main}}/api/
+
+Swagger UI: http://dev.{{cookiecutter.domain_main}}/swagger/
+
+CouchDB: http://dev.{{cookiecutter.domain_main}}:5984/_utils
+
+Flower: http://dev.{{cookiecutter.domain_main}}:5555
+
+Traefik UI: http://dev.{{cookiecutter.domain_main}}:8090
 
 
 ## Project generation and updating, or re-generating

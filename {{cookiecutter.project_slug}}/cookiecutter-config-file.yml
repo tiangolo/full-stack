@@ -3,7 +3,6 @@ default_context:
   project_slug: '{{ cookiecutter.project_slug }}'
   domain_main: '{{ cookiecutter.domain_main }}'
   domain_staging: '{{ cookiecutter.domain_staging }}'
-  domain_dev: '{{ cookiecutter.domain_dev }}'
   docker_swarm_stack_name_main: '{{ cookiecutter.docker_swarm_stack_name_main }}'
   docker_swarm_stack_name_staging: '{{ cookiecutter.docker_swarm_stack_name_staging }}'
   secret_key: '{{ cookiecutter.secret_key }}'
