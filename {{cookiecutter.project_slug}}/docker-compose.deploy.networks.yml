@@ -2,15 +2,15 @@ version: '3'
 services:
   pgadmin:
     networks:
-      - {{cookiecutter.traefik_public_network}}
+      - ${TRAEFIK_PUBLIC_NETWORK}
       - default
   proxy:
     networks:
-      - {{cookiecutter.traefik_public_network}}
+      - ${TRAEFIK_PUBLIC_NETWORK}
       - default
   flower:
     networks:
-      - {{cookiecutter.traefik_public_network}}
+      - ${TRAEFIK_PUBLIC_NETWORK}
       - default
 
 networks:
