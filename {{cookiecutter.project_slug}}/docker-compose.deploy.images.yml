@@ -1,8 +1,8 @@
 version: '3'
 services:
   backend:
-    image: '{{cookiecutter.docker_image_backend}}:${TAG-latest}'
+    image: '${DOCKER_IMAGE_BACKEND}:${TAG-latest}'
   celeryworker:
-    image: '{{cookiecutter.docker_image_celeryworker}}:${TAG-latest}'
+    image: '${DOCKER_IMAGE_CELERYWORKER}:${TAG-latest}'
   frontend:
-    image: '{{cookiecutter.docker_image_frontend}}:${TAG-latest}'
+    image: '${DOCKER_IMAGE_FRONTEND}:${TAG-latest}'

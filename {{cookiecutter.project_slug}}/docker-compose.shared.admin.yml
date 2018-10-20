@@ -5,8 +5,8 @@ services:
     depends_on:
       - db
     environment:
-      - DEFAULT_USER={{cookiecutter.pgadmin_default_user}}
-      - DEFAULT_PASSWORD={{cookiecutter.pgadmin_default_user_password}}
+      - DEFAULT_USER=${PG_ADMIN_DEFAULT_USER}
+      - DEFAULT_PASSWORD=${PG_ADMIN_DEFAULT_PASSWORD}
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
@@ -18,4 +18,4 @@ services:
   flower:
     image: totem/celery-flower-docker
     environment:
-      - FLOWER_BASIC_AUTH={{cookiecutter.flower_auth}}
+      - FLOWER_BASIC_AUTH=${FLOWER_BASIC_AUTH}

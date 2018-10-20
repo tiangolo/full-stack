@@ -17,7 +17,7 @@ security_definitions = {
 app.config.update(
     {
         "APISPEC_SPEC": APISpec(
-            title="{{cookiecutter.project_name}}",
+            title=config.PROJECT_NAME,
             version="v1",
             plugins=("apispec.ext.marshmallow",),
             securityDefinitions=security_definitions,

@@ -1,8 +1,4 @@
 module.exports = {
-  devServer: {
-    public: `${process.env.VUE_APP_DOMAIN_DEV}:8080`,
-  },
-
   chainWebpack: config => {
     config.module
       .rule('vue')

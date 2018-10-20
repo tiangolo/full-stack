@@ -76,7 +76,6 @@ The input variables, with their default values (some auto generated) are:
 * `project_slug`: The development friendly name of the project. By default, based on the project name
 * `domain_main`: The domain in where to deploy the project for production (from the branch `production`), used by the load balancer, backend, etc. By default, based on the project slug.
 * `domain_staging`: The domain in where to deploy while staging (before production) (from the branch `master`). By default, based on the main domain.
-* `domain_dev`: The domain to use while developing. It won't be deployed, but you should use it by modifying your local `hosts` file.
 
 * `docker_swarm_stack_name_main`: The name of the stack while deploying to Docker in Swarm mode for production. By default, based on the domain.
 * `docker_swarm_stack_name_staging`: The name of the stack while deploying to Docker in Swarm mode for staging. By default, based on the domain.

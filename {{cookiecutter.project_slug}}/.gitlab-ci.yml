@@ -43,7 +43,6 @@ deploy-stag:
     - >
       DOMAIN={{cookiecutter.domain_staging}}
       TRAEFIK_TAG={{cookiecutter.traefik_constraint_tag_staging}}
-      TRAEFIK_PUBLIC_TAG={{cookiecutter.traefik_public_constraint_tag}}
       STACK_NAME={{cookiecutter.docker_swarm_stack_name_staging}}
       TAG=stag
       sh ./script-deploy.sh
@@ -62,7 +61,6 @@ deploy-prod:
     - >
       DOMAIN={{cookiecutter.domain_main}}
       TRAEFIK_TAG={{cookiecutter.traefik_constraint_tag}}
-      TRAEFIK_PUBLIC_TAG={{cookiecutter.traefik_public_constraint_tag}}
       STACK_NAME={{cookiecutter.docker_swarm_stack_name_main}}
       TAG=prod
       sh ./script-deploy.sh
