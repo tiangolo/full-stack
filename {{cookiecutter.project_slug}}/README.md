@@ -215,43 +215,27 @@ If you are using **Docker Toolbox** in Windows or macOS instead of **Docker for 
 
 The address of your Docker Toolbox virtual machine would probably be `192.168.99.100` (that is the default).
 
-As this is a common case, the domain `local.dockertoolbox.tiangolo.com` points to that (private) IP, just to help with development. That way, you can start the stack in Docker Toolbox, and use that domain for development. You will be able to open that URL in Chrome and it will communicate with your local Docker Toolbox directly as if it was a cloud server, including CORS (Cross Origin Resource Sharing).
+As this is a common case, the domain `local.dockertoolbox.tiangolo.com` points to that (private) IP, just to help with development (actually `dockertoolbox.tiangolo.com` and all its subdomains point to that IP). That way, you can start the stack in Docker Toolbox, and use that domain for development. You will be able to open that URL in Chrome and it will communicate with your local Docker Toolbox directly as if it was a cloud server, including CORS (Cross Origin Resource Sharing).
 
-To use it, you need to tell your backend that it is running on that domain, you will have to edit a couple files.
+If you used the default CORS enabled domains while generating the project, `local.dockertoolbox.tiangolo.com` was configured to be allowed. If you didn't, you will need to add it to the list in the variable `BACKEND_CORS_ORIGINS` in the `.env` file.
 
-* Open the file located at `./.env`. It would have 2 lines like:
+To configure it in your stack, follow the section **Change the development "domain"** below, using the domain `local.dockertoolbox.tiangolo.com`.
 
-```
-DOMAIN=localhost
-# DOMAIN=local.dockertoolbox.tiangolo.com
-```
+After performing those steps you should be able to open: http://local.dockertoolbox.tiangolo.com and it will be server by your stack in your Docker Toolbox virtual machine.
 
-* Switch the comment, change the section to:
+Check all the corresponding available URLs in the section at the end.
 
-```
-# DOMAIN=localhost
-DOMAIN=local.dockertoolbox.tiangolo.com
-```
+### Develpment in `localhost` with a custom domain
 
-That variable will be used by the `docker-compose.dev.env.yml` file. That's one of the Docker Compose files used by default. It will set the environment variable `SERVER_NAME` to that host. Without that change, you would receive 404 HTTP errors and "Cross Origin Resource Sharing" (CORS) errors.
+You might want to use something different than `localhost` as the domain. For example, if you are having problems with cookies that need a subdomain, and Chrome is not allowing you to use `localhost`. 
 
-* Now open the file located at `./frontend/.env`. It would have a line like:
+In that case, you have two options: you could use the instructions to modify your system `hosts` file with the instructions below in **Development with a custom IP** or you can just use `localhost.tiangolo.com`, it is set up to point to `localhost` (to the IP `127.0.0.1`) and all its subdomains too. And as it is an actual domain, the browsers will store the cookies you set during development, etc.
 
-```
-VUE_APP_DOMAIN_DEV=localhost
-# VUE_APP_DOMAIN_DEV=local.dockertoolbox.tiangolo.com
-```
+If you used the default CORS enabled domains while generating the project, `localhost.tiangolo.com` was configured to be allowed. If you didn't, you will need to add it to the list in the variable `BACKEND_CORS_ORIGINS` in the `.env` file.
 
-* Change that line to:
+To configure it in your stack, follow the section **Change the development "domain"** below, using the domain `localhost.tiangolo.com`.
 
-```
-# VUE_APP_DOMAIN_DEV=localhost
-VUE_APP_DOMAIN_DEV=local.dockertoolbox.tiangolo.com
-```
-
-That variable will make your frontend communicate with that domain when interacting with the API, when the other variable `VUE_APP_ENV` is set to `development`.
-
-Now you can open: http://local.dockertoolbox.tiangolo.com and it will be server by your Docker Toolbox.
+After performing those steps you should be able to open: http://localhost.tiangolo.com and it will be server by your stack in `localhost`.
 
 Check all the corresponding available URLs in the section at the end.
 
@@ -260,6 +244,8 @@ Check all the corresponding available URLs in the section at the end.
 If you are running Docker in an IP address different than `127.0.0.1` (`localhost`) and `192.168.99.100` (the default of Docker Toolbox), you will need to perform some additional steps. That will be the case if you are running a custom Virtual Machine, a secondary Docker Toolbox or your Docker is located in a different machine in your network.
 
 In that case, you will need to use a fake local domain (`dev.{{cookiecutter.domain_main}}`) and make your computer think that the domain is is served by the custom IP (e.g. `192.168.99.150`).
+
+If you used the default CORS enabled domains, `dev.{{cookiecutter.domain_main}}` was configured to be allowed. If you want a custom one, you need to add it to the list in the variable `BACKEND_CORS_ORIGINS` in the `.env` file.
 
 * Open your `hosts` file with administrative privileges using a text editor:
   * **Note for Windows**: If you are in Windows, open the main Windows menu, search for "notepad", right click on it, and select the option "open as Administrator" or similar. Then click the "File" menu, "Open file", go to the directory `c:\Windows\System32\Drivers\etc\`, select the option to show "All files" instead of only "Text (.txt) files", and open the `hosts` file.
@@ -278,7 +264,15 @@ The new line might look like:
 
 ...that will make your computer think that the fake local domain is served by that custom IP, and when you open that URL in your browser, it will talk directly to your locally running server when it is asked to go to `dev.{{cookiecutter.domain_main}}` and think that it is a remote server while it is actually running in your computer.
 
-Now you need to make sure the stack uses that domain.
+To configure it in your stack, follow the section **Change the development "domain"** below, using the domain `dev.{{cookiecutter.domain_main}}`.
+
+After performing those steps you should be able to open: http://dev.{{cookiecutter.domain_main}} and it will be server by your stack in `localhost`.
+
+### Change the development "domain"
+
+If you need to use your local stack with a different domain than `localhost`, you need to make sure the domain you use points to the IP where your stack is set up. See the different ways to achieve that in the sections above (i.e. using Docker Toolbox with `local.dockertoolbox.tiangolo.com`, using `localhost.tiangolo.com` or using `dev.{{cookiecutter.domain_main}}`).
+
+To simplify your Docker Compose setup, for example, so that the API explorer, Swagger UI, knows where is your API, you should let it know you are using that domain for development. You will need to edit 1 line in 2 files.
 
 * Open the file located at `./.env`. It would have a line like:
 
@@ -286,13 +280,13 @@ Now you need to make sure the stack uses that domain.
 DOMAIN=localhost
 ```
 
-* Change that line to:
+* Change it to the domain you are going to use, e.g.:
 
 ```
-DOMAIN=dev.{{cookiecutter.domain_main}}
+DOMAIN=localhost.tiangolo.com
 ```
 
-That variable will be used by the `docker-compose.dev.env.yml` file. That's one of the Docker Compose files used by default. It will set the environment variable `SERVER_NAME` to that host. Without that change, you would receive 404 HTTP errors and "Cross Origin Resource Sharing" (CORS) errors.
+That variable will be used by some of the local development `docker-compose.dev.*.yml` files, for example, to tell Swagger UI to use that domain for the API.
 
 * Now open the file located at `./frontend/.env`. It would have a line like:
 
@@ -300,17 +294,21 @@ That variable will be used by the `docker-compose.dev.env.yml` file. That's one 
 VUE_APP_DOMAIN_DEV=localhost
 ```
 
-* Change that line to:
+* Change that line to the domain you are going to use, e.g.:
 
 ```
-VUE_APP_DOMAIN_DEV=dev.{{cookiecutter.domain_main}}
+VUE_APP_DOMAIN_DEV=localhost.tiangolo.com
 ```
 
-That variable will make your frontend communicate with that domain when interacting with the API, when the other variable `VUE_APP_ENV` is set to `development`.
+That variable will make your frontend communicate with that domain when interacting with your backend API, when the other variable `VUE_APP_ENV` is set to `development`.
 
-Now you can open: http://dev.{{cookiecutter.domain_main}} and it will be server by your Docker Toolbox.
+After changing the two lines, you can re-start your stack with:
 
-Check all the corresponding available URLs in the section at the end.
+```bash
+docker-compose up -d
+```
+
+and check all the corresponding available URLs in the section at the end.
 
 ## Frontend development
 
@@ -629,6 +627,21 @@ Flower: http://dev.{{cookiecutter.domain_main}}:5555
 
 Traefik UI: http://dev.{{cookiecutter.domain_main}}:8090
 
+### Development in localhost with a custom domain
+
+Development URLs, for local development.
+
+Frontend: http://localhost.tiangolo.com
+
+Backend: http://localhost.tiangolo.com/api/
+
+Swagger UI: http://localhost.tiangolo.com/swagger/
+
+CouchDB: http://localhost.tiangolo.com:5984/_utils
+
+Flower: http://localhost.tiangolo.com:5555
+
+Traefik UI: http://localhost.tiangolo.com:8090
 
 ## Project generation and updating, or re-generating
 
