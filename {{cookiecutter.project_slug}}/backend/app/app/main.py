@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Import installed packages
 from flask import Flask
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Import installed modules
 # Import installed packages
 from webargs import fields

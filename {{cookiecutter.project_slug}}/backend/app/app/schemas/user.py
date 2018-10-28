@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Import standard library packages
 
 # Import installed packages

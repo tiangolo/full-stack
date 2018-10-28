@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Import standard library packages
 from datetime import datetime
 
