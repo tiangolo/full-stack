@@ -20,6 +20,7 @@ def test_get_users_superuser_me(superuser_token_headers):
     assert current_user["email"] == config.FIRST_SUPERUSER
     assert current_user["is_superuser"] is True
 
+
 def test_create_user_new_email(superuser_token_headers):
     server_api = get_server_api()
     username = random_lower_string()

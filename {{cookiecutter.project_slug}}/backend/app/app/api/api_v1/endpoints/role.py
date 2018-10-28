@@ -13,7 +13,14 @@ from app.api.api_v1.api_docs import docs, security_params
 from app.core import config
 from app.db.flask_session import db_session
 from app.core.celery_app import celery_app
-from app.db.utils import (check_if_user_is_active, check_if_user_is_superuser, get_role_by_name, create_role, get_roles, get_user_roles)
+from app.db.utils import (
+    check_if_user_is_active,
+    check_if_user_is_superuser,
+    get_role_by_name,
+    create_role,
+    get_roles,
+    get_user_roles,
+)
 
 # Import Schemas
 from app.schemas.role import RoleSchema

@@ -13,7 +13,16 @@ from app.core import config
 from app.core.security import pwd_context
 from app.db.flask_session import db_session
 from app.core.celery_app import celery_app
-from app.db.utils import check_if_user_is_active, check_if_user_is_superuser, get_users, get_user_by_username, create_user, get_user_by_id, get_role_by_id, assign_role_to_user
+from app.db.utils import (
+    check_if_user_is_active,
+    check_if_user_is_superuser,
+    get_users,
+    get_user_by_username,
+    create_user,
+    get_user_by_id,
+    get_role_by_id,
+    assign_role_to_user,
+)
 
 from app.main import app
 
@@ -26,11 +35,7 @@ from app.models.role import Role
 
 
 @docs.register
-@doc(
-    description="Retrieve the users",
-    security=security_params,
-    tags=["users"],
-)
+@doc(description="Retrieve the users", security=security_params, tags=["users"])
 @app.route(f"{config.API_V1_STR}/users/", methods=["GET"])
 @marshal_with(UserSchema(many=True))
 @jwt_required
@@ -61,9 +66,7 @@ def route_users_get():
 )
 @marshal_with(UserSchema())
 @jwt_required
-def route_users_post(
-    email=None, password=None, first_name=None, last_name=None,
-):
+def route_users_post(email=None, password=None, first_name=None, last_name=None):
     current_user = get_current_user()
 
     if not current_user:
@@ -79,8 +82,9 @@ def route_users_post(
         return abort(
             400, f"The user with this email already exists in the system: {email}"
         )
-    user = create_user(db_session, email, password, first_name, last_name )
+    user = create_user(db_session, email, password, first_name, last_name)
     return user
+
 
 @docs.register
 @doc(description="Create new user without the need to be logged in", tags=["users"])
@@ -94,12 +98,10 @@ def route_users_post(
     }
 )
 @marshal_with(UserSchema())
-def route_users_post_open(
-    email=None, password=None, first_name=None, last_name=None,
-):
+def route_users_post_open(email=None, password=None, first_name=None, last_name=None):
     if not config.USERS_OPEN_REGISTRATION:
         abort(403, "Open user resgistration is forbidden on this server")
-    
+
     user = get_user_by_username(email, db_session)
 
     if user:
@@ -149,11 +151,13 @@ def route_users_id_get(user_id):
 
 
 @docs.register
-@doc(description="Assign a role to a user by ID", security=security_params, tags=["users"])
+@doc(
+    description="Assign a role to a user by ID",
+    security=security_params,
+    tags=["users"],
+)
 @app.route(f"{config.API_V1_STR}/users/<int:user_id>/roles/", methods=["POST"])
-@use_kwargs({
-    "role_id": fields.Int(required=True),
-})
+@use_kwargs({"role_id": fields.Int(required=True)})
 @marshal_with(UserSchema())
 @jwt_required
 def route_users_assign_role_post(user_id, role_id):
@@ -169,10 +173,10 @@ def route_users_assign_role_post(user_id, role_id):
     user = get_user_by_id(user_id, db_session)
     if not user:
         return abort(400, f"The user with id: {user_id} does not exists")
-    
+
     role = get_role_by_id(role_id, db_session)
     if not role:
         return abort(400, f"The role does not exist")
-    
+
     updated_user = assign_role_to_user(role, user, db_session)
     return updated_user

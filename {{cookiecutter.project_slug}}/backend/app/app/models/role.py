@@ -16,6 +16,4 @@ class Role(Base):
     created_at = Column(DateTime, default=datetime.utcnow(), index=True)
     name = Column(String, index=True)
     # Relationships
-    users = relationship(
-        "User", secondary=users_roles, back_populates="roles"
-    )
+    users = relationship("User", secondary=users_roles, back_populates="roles")
