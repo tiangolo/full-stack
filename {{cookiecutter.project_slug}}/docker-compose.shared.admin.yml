@@ -4,9 +4,8 @@ services:
     image: fenglc/pgadmin4
     depends_on:
       - db
-    environment:
-      - DEFAULT_USER=${PG_ADMIN_DEFAULT_USER}
-      - DEFAULT_PASSWORD=${PG_ADMIN_DEFAULT_PASSWORD}
+    env_file:
+      - env-pgadmin.env
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
@@ -17,5 +16,5 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
   flower:
     image: totem/celery-flower-docker
-    environment:
-      - FLOWER_BASIC_AUTH=${FLOWER_BASIC_AUTH}
+    env_file:
+      - env-flower.env
