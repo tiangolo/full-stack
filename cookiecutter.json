@@ -22,7 +22,7 @@
     "traefik_public_network": "traefik-public",
     "traefik_public_constraint_tag": "traefik-public",
     
-    "flower_auth": "root:changethis",
+    "flower_auth": "admin:{{cookiecutter.first_superuser_password}}",
     
     "sentry_dsn": "",
 
