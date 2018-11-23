@@ -129,7 +129,7 @@ If you use GitLab CI the tests will automatically.
 
 If you know about Python [Jupyter Notebooks](http://jupyter.org/), you can take advantage of them during local development.
 
-The `docker-compose.dev.build.yml` file sends a variable `env` with a value `dev ` to the build process of the Docker image (during local development) and the `Dockerfile` has steps to then install and configure Jupyter inside your Docker container.
+The `docker-compose.dev.build.yml` file sends a variable `env` with a value `dev` to the build process of the Docker image (during local development) and the `Dockerfile` has steps to then install and configure Jupyter inside your Docker container.
 
 So, you can enter into the Docker running container:
 
