@@ -1,7 +1,7 @@
 version: '3'
 services:
   pgadmin:
-    image: fenglc/pgadmin4
+    image: dpage/pgadmin4
     depends_on:
       - db
     env_file:
