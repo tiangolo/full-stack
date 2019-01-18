@@ -211,7 +211,7 @@ docker service create \
     --label "traefik.redirectorservice.frontend.entryPoints=http" \
     --label "traefik.redirectorservice.frontend.redirect.entryPoint=https" \
     --label "traefik.webservice.frontend.entryPoints=https" \
-    --label "traefik.frontend.auth.basic=$USERNAME_PASSWORD" \
+    --label "traefik.frontend.auth.basic.users=$USERNAME_PASSWORD" \
     traefik:v1.6 \
     --docker \
     --docker.swarmmode \
@@ -252,7 +252,7 @@ The previous command explained:
 * `--label "traefik.redirectorservice.frontend.entryPoints=http"`: make the web dashboard listen to HTTP, so that it can redirect to HTTPS
 * `--label "traefik.redirectorservice.frontend.redirect.entryPoint=https"`: make Traefik redirect HTTP trafic to HTTPS for the web dashboard
 * `--label "traefik.webservice.frontend.entryPoints=https"`: make the web dashboard listen and serve on HTTPS
-* `--label "traefik.frontend.auth.basic=$USERNAME_PASSWORD"`: enable basic auth, so that not every one can access your Traefik web dashboard, it uses the username and password created above
+* `--label "traefik.frontend.auth.basic.users=$USERNAME_PASSWORD"`: enable basic auth, so that not every one can access your Traefik web dashboard, it uses the username and password created above
 * `traefik:v1.6`: use the image `traefik:v1.6`
 * `--docker`: enable Docker
 * `--docker.swarmmode`: enable Docker Swarm Mode
@@ -435,7 +435,7 @@ docker service create \
     --label "traefik.redirectorservice.frontend.redirect.entryPoint=https" \
     --label "traefik.redirectorservice.frontend.redirect.entryPoint=https" \
     --label "traefik.webservice.frontend.entryPoints=https" \
-    --label "traefik.frontend.auth.basic=$USERNAME_PASSWORD" \
+    --label "traefik.frontend.auth.basic.users=$USERNAME_PASSWORD" \
     google/cadvisor:latest
 ```
 
