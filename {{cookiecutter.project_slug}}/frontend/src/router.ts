@@ -28,5 +28,8 @@ export default new Router({
       name: 'main',
       component: () => import(/* webpackChunkName: "main" */ './views/Main.vue'),
     },
+    {
+      path: '/*', redirect: '/',
+    },
   ],
 });
