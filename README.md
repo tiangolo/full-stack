@@ -8,42 +8,42 @@ Generate a backend and frontend stack using Python, including interactive API do
 
 ## Features
 
-* Full Docker integration (Docker based)
+* Full **Docker** integration (Docker based)
 * Docker Swarm Mode deployment
-* Docker Compose integration and optimization for local development
-* Production ready Python web server using Nginx and uWSGI
-* Python Flask backend with:
-  * Flask-apispec: Swagger live documentation generation
-  * Marshmallow: model and data serialization (convert model objects to JSON)
-  * Webargs: parse, validate and document inputs to the endpoint / route
-  * Secure password hashing by default
-  * JWT token authentication
-  * SQLAlchemy models (independent of Flask extensions, so they can be used with Celery workers directly)
+* **Docker Compose** integration and optimization for local development
+* **Production ready** Python web server using Nginx and uWSGI
+* Python **Flask** backend with:
+  * **Flask-apispec**: Swagger live documentation generation
+  * **Marshmallow**: model and data serialization (convert model objects to JSON)
+  * **Webargs**: parse, validate and document inputs to the endpoint / route
+  * **Secure password** hashing by default
+  * **JWT token** authentication
+  * **SQLAlchemy** models (independent of Flask extensions, so they can be used with Celery workers directly)
   * Basic starting models for users and groups (modify and remove as you need)
-  * Alembic migrations
-  * CORS (Cross Origin Resource Sharing)
-* Celery worker that can import and use models and code from the rest of the backend selectively (you don't have to install the complete app in each worker)
-* REST backend tests based on Pytest, integrated with Docker, so you can test the full API interaction, independent on the database. As it runs in Docker, it can build a new data store from scratch each time (so you can use ElasticSearch, MongoDB, CouchDB, or whatever you want, and just test that the API works)
-* Easy Python integration with Jupyter Kernels for remote or in-Docker development with extensions like Atom Hydrogen or Visual Studio Code Jupyter
+  * **Alembic** migrations
+  * **CORS** (Cross Origin Resource Sharing)
+* **Celery** worker that can import and use models and code from the rest of the backend selectively (you don't have to install the complete app in each worker)
+* REST backend tests based on **Pytest**, integrated with Docker, so you can test the full API interaction, independent on the database. As it runs in Docker, it can build a new data store from scratch each time (so you can use ElasticSearch, MongoDB, CouchDB, or whatever you want, and just test that the API works)
+* Easy Python integration with **Jupyter Kernels** for remote or in-Docker development with extensions like Atom Hydrogen or Visual Studio Code Jupyter
 * Vue frontend:
-  * Generated with Vue CLI
+  * Generated with **Vue CLI**
   * JWT Authentication handling
   * Login view
   * After login, main dashboard view
-  * Vuex
-  * Vue-router
-  * Vuetify for beautiful material design components
-  * TypeScript
-  * Docker server based on Nginx (configured to play nicely with Vue-router)
+  * **Vuex**
+  * **Vue-router**
+  * **Vuetify** for beautiful material design components
+  * **TypeScript**
+  * Docker server based on **Nginx** (configured to play nicely with Vue-router)
   * Docker multi-stage building, so you don't need to save or commit compiled code
   * Frontend tests ran at build time (can be disabled too)
   * Made as modular as possible, so it works out of the box, but you can re-generate with Vue CLI or create it as you need, and re-use what you want
-* PGAdmin for PostgreSQL database, you can modify it to use PHPMyAdmin and MySQL easily
-* Swagger-UI for live interactive documentation
-* Flower for Celery jobs monitoring
-* Load balancing between frontend and backend with Traefik, so you can have both under the same domain, separated by path, but served by different containers
-* Traefik integration, including Let's Encrypt HTTPS certificates automatic generation
-* GitLab CI (continuous integration), including frontend and backend testing
+* **PGAdmin** for PostgreSQL database, you can modify it to use PHPMyAdmin and MySQL easily
+* **Swagger-UI** for live interactive documentation
+* **Flower** for Celery jobs monitoring
+* Load balancing between frontend and backend with **Traefik**, so you can have both under the same domain, separated by path, but served by different containers
+* Traefik integration, including Let's Encrypt **HTTPS** certificates automatic generation
+* **GitLab CI** (continuous integration), including frontend and backend testing
 
 ## How to use it
 
