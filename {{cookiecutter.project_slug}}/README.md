@@ -123,7 +123,7 @@ The tests run with Pytest, modify and add tests to `./backend/app/app/tests/`.
 
 If you need to install any additional package for the tests, add it to the file `./backend/app/tests.dockerfile`.
 
-If you use GitLab CI the tests will automatically.
+If you use GitLab CI the tests will run automatically.
 
 ### Live development with Python Jupyter Notebooks
 
@@ -267,6 +267,8 @@ The new line might look like:
 To configure it in your stack, follow the section **Change the development "domain"** below, using the domain `dev.{{cookiecutter.domain_main}}`.
 
 After performing those steps you should be able to open: http://dev.{{cookiecutter.domain_main}} and it will be server by your stack in `localhost`.
+
+Check all the corresponding available URLs in the section at the end.
 
 ### Change the development "domain"
 
@@ -689,7 +691,7 @@ Backend: http://dev.{{cookiecutter.domain_main}}/api/
 
 Swagger UI: http://dev.{{cookiecutter.domain_main}}/swagger/
 
-CouchDB: http://dev.{{cookiecutter.domain_main}}:5984/_utils
+PGAdmin: http://dev.{{cookiecutter.domain_main}}:5050
 
 Flower: http://dev.{{cookiecutter.domain_main}}:5555
 
@@ -705,7 +707,7 @@ Backend: http://localhost.tiangolo.com/api/
 
 Swagger UI: http://localhost.tiangolo.com/swagger/
 
-CouchDB: http://localhost.tiangolo.com:5984/_utils
+PGAdmin: http://localhost.tiangolo.com:5050
 
 Flower: http://localhost.tiangolo.com:5555
 
