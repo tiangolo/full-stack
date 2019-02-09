@@ -11,7 +11,7 @@ services:
     environment:
       - API_URL=https://${DOMAIN}/api/v1/swagger/
   proxy:
-    image: traefik:v1.6
+    image: traefik:v1.7
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   flower:
