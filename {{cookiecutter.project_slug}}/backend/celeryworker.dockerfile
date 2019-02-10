@@ -1,6 +1,6 @@
 FROM python:3.6
 
-RUN pip install psycopg2-binary raven pyyaml celery==4.2.1 SQLAlchemy==1.2.12 passlib[bcrypt] tenacity
+RUN pip install psycopg2-binary==2.7.7 raven celery==4.2.1 SQLAlchemy==1.2.12 passlib[bcrypt]==1.7.1 tenacity==5.0.3
 
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:
