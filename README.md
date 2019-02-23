@@ -6,6 +6,22 @@ Generate a backend and frontend stack using Python, including interactive API do
 
 [![Screenshot](screenshot.png)](https://github.com/tiangolo/full-stack)
 
+## Notice: Flask or [FastAPI](https://github.com/tiangolo/fastapi)
+
+If you are using this project (or Flask in general to create web APIs) you would probably benefit more from [FastAPI](https://github.com/tiangolo/fastapi).
+
+You can use the equivalent sibling project generator based on **FastAPI**: [https://github.com/tiangolo/full-stack-fastapi-postgresql](https://github.com/tiangolo/full-stack-fastapi-postgresql). It also has more features than this one.
+
+There is also a FastAPI project generator based on Couchbase instead of PostgreSQL: [https://github.com/tiangolo/full-stack-fastapi-couchbase](https://github.com/tiangolo/full-stack-fastapi-couchbase).
+
+**FastAPI** was created from the learnings acquired while creating and using these project generators for Flask, with all the plug-ins and ideas.
+
+* **FastAPI** (and its project generators), would give you about 800% (8x) the performance achievable with this one.
+* Writing code in **FastAPI** is about 200% to 300% faster. Because you write a lot less code, it is designed for web APIs, and you have auto-complete everywhere.
+* About 40% of the human (developer) induced errors can be reduced (**FastAPI** does a lot of the data validation, conversion and documentation for you).
+
+---
+
 ## Features
 
 * Full **Docker** integration (Docker based)
