@@ -20,7 +20,7 @@ You can use the equivalent sibling project generator based on **FastAPI**: [http
 
 ## ⚠️ DEPRECATION WARNING ⚠️
 
-As **FastAPI** and the equivalent project generator provide a much better solution to all the use cases this project was built for, all the future development will be done there.
+As [**FastAPI**](https://github.com/tiangolo/fastapi) and the [equivalent project generator](https://github.com/tiangolo/full-stack-fastapi-postgresql) provide a much better solution to all the use cases this project was built for, all the future development will be done there.
 
 You are still free to use this project, but it won't receive any new features, changes, or bug fixes.
 
