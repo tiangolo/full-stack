@@ -1,3 +1,11 @@
+## 🚨 DEPRECATION WARNING 🚨
+
+As [**FastAPI**](https://github.com/tiangolo/fastapi) and the [equivalent project generator](https://github.com/tiangolo/full-stack-fastapi-postgresql) provide a much better solution to all the use cases this project was built for, all the future development will be done there.
+
+You are still free to use this project, but it won't receive any new features, changes, or bug fixes.
+
+If you are starting a new project from scratch, check the alternatives at the [FastAPI docs: Project Generation](https://fastapi.tiangolo.com/project-generation/).
+
 # Full Stack Flask and PostgreSQL - Base Project Generator
 
 [![Build Status](https://travis-ci.org/tiangolo/full-stack.svg?branch=master)](https://travis-ci.org/tiangolo/full-stack)
@@ -17,12 +25,6 @@ You can use the equivalent sibling project generator based on **FastAPI**: [http
 * **FastAPI** (and its project generators), would give you about 800% (8x) the performance achievable with this one.
 * Writing code in **FastAPI** is about 200% to 300% faster. Because you write a lot less code, it is designed for web APIs, and you have auto-complete everywhere.
 * About 40% of the human (developer) induced errors can be reduced (**FastAPI** does a lot of the data validation, conversion and documentation for you).
-
-## ⚠️ DEPRECATION WARNING ⚠️
-
-As [**FastAPI**](https://github.com/tiangolo/fastapi) and the [equivalent project generator](https://github.com/tiangolo/full-stack-fastapi-postgresql) provide a much better solution to all the use cases this project was built for, all the future development will be done there.
-
-You are still free to use this project, but it won't receive any new features, changes, or bug fixes.
 
 ---
 
